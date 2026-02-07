@@ -1,0 +1,551 @@
+/**
+ * Valentine's Week 2026 — Main Styles
+ * Ultra-minimal, cinematic, premium design
+ */
+
+:root {
+    /* STRICT Color Palette */
+    --charcoal: #0b0b0f;
+    --rose-red: #e63946;
+    --champagne-gold: #f1c27d;
+
+    /* Opacity variants */
+    --rose-red-30: rgba(230, 57, 70, 0.3);
+    --rose-red-50: rgba(230, 57, 70, 0.5);
+    --champagne-gold-30: rgba(241, 194, 125, 0.3);
+    --champagne-gold-50: rgba(241, 194, 125, 0.5);
+
+    /* Typography */
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 2rem;
+    --space-lg: 4rem;
+    --space-xl: 8rem;
+
+    /* Transitions */
+    --transition-slow: 1s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-medium: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-body);
+    font-weight: 300;
+    color: var(--champagne-gold);
+    background: var(--charcoal);
+    overflow: hidden;
+    cursor: none;
+}
+
+/* Hide default cursor */
+* {
+    cursor: none !important;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+.display-text {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+}
+
+.body-text {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.8;
+    letter-spacing: 0.01em;
+}
+
+.label-text {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+/* Day Info Overlay */
+.day-info {
+    position: fixed;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+    z-index: 20;
+}
+
+.day-info.visible {
+    opacity: 1;
+}
+
+.day-info .day-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 300;
+    color: var(--champagne-gold);
+    margin-bottom: var(--space-xs);
+}
+
+.day-info .day-theme {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 300;
+    color: var(--rose-red);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+}
+
+/* Capsule Labels */
+.capsule-label {
+    position: absolute;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.capsule-label.visible {
+    opacity: 1;
+}
+
+.capsule-label .date {
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: 400;
+    color: var(--champagne-gold-50);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+/* Experience UI */
+.experience-ui {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.experience-ui .instruction {
+    position: absolute;
+    bottom: var(--space-lg);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--champagne-gold-50);
+    text-align: center;
+    animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Exit Button */
+.exit-button {
+    position: fixed;
+    top: var(--space-md);
+    left: var(--space-md);
+    pointer-events: auto;
+    background: none;
+    border: 1px solid var(--champagne-gold-30);
+    color: var(--champagne-gold);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: var(--space-xs) var(--space-sm);
+    transition: all var(--transition-fast);
+    opacity: 0;
+    z-index: 25;
+}
+
+.exit-button.visible {
+    opacity: 1;
+}
+
+.exit-button:hover {
+    border-color: var(--rose-red);
+    color: var(--rose-red);
+}
+
+/* Countdown Display */
+.countdown {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    text-align: right;
+    z-index: 20;
+    opacity: 0.5;
+}
+
+.countdown .label {
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: 400;
+    color: var(--rose-red);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: var(--space-xs);
+}
+
+.countdown .time {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--champagne-gold);
+    letter-spacing: 0.1em;
+}
+
+/* Completion Animation */
+.completion-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--charcoal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-slow);
+}
+
+.completion-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.completion-overlay .message {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--champagne-gold);
+    text-align: center;
+    line-height: 1.6;
+    max-width: 600px;
+    padding: var(--space-md);
+}
+
+/* Lock State Message */
+.lock-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-medium);
+    z-index: 50;
+}
+
+.lock-message.visible {
+    opacity: 1;
+}
+
+.lock-message.past .text {
+    color: var(--champagne-gold-30);
+}
+
+.lock-message.future .text {
+    color: var(--rose-red-50);
+}
+
+.lock-message .text {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-style: italic;
+    line-height: 1.8;
+}
+
+/* Admin Panel */
+.admin-panel {
+    position: fixed;
+    bottom: var(--space-md);
+    right: var(--space-md);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.admin-panel.visible {
+    opacity: 1;
+}
+
+.admin-input {
+    background: rgba(11, 11, 15, 0.9);
+    border: 1px solid var(--champagne-gold-30);
+    color: var(--champagne-gold);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    padding: var(--space-xs) var(--space-sm);
+    width: 200px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.admin-input:focus {
+    border-color: var(--rose-red);
+}
+
+.admin-input::placeholder {
+    color: var(--champagne-gold-30);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    :root {
+        --space-lg: 2rem;
+        --space-xl: 4rem;
+    }
+
+    .display-text {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+}
+
+/* Selection styling */
+::selection {
+    background: var(--rose-red);
+    color: var(--charcoal);
+}
+
+/* Scrollbar (hidden) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Focus states for accessibility */
+:focus-visible {
+    outline: 1px solid var(--rose-red);
+    outline-offset: 2px;
+}
+
+/* ===== MOBILE & CROSS-DEVICE OPTIMIZATIONS ===== */
+
+/* Hide default cursor on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    body {
+        cursor: auto;
+    }
+
+    * {
+        cursor: auto !important;
+    }
+
+    #cursor {
+        display: none !important;
+    }
+}
+
+/* Mobile Breakpoint - Phones */
+@media screen and (max-width: 768px) {
+    :root {
+        --space-sm: 0.75rem;
+        --space-md: 1.5rem;
+        --space-lg: 2rem;
+    }
+
+    .day-info {
+        bottom: var(--space-md);
+    }
+
+    .day-info .day-name {
+        font-size: clamp(1.2rem, 5vw, 2rem);
+    }
+
+    .day-info .day-theme {
+        font-size: clamp(0.7rem, 3vw, 0.875rem);
+        letter-spacing: 0.2em;
+    }
+
+    .experience-ui .instruction {
+        font-size: clamp(0.9rem, 4vw, 1.25rem);
+        bottom: var(--space-md);
+        padding: 0 var(--space-md);
+    }
+
+    .exit-button {
+        top: var(--space-sm);
+        left: var(--space-sm);
+        font-size: 0.65rem;
+        padding: 0.4rem 0.8rem;
+        /* Ensure minimum tap target size */
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .countdown {
+        top: var(--space-sm);
+        right: var(--space-sm);
+    }
+
+    .countdown .label {
+        font-size: 0.5rem;
+        letter-spacing: 0.15em;
+    }
+
+    .countdown .time {
+        font-size: clamp(0.9rem, 4vw, 1.2rem);
+    }
+
+    .completion-overlay .message {
+        font-size: clamp(1.2rem, 5vw, 2rem);
+        padding: var(--space-sm);
+    }
+
+    .lock-message .text {
+        font-size: clamp(1rem, 4vw, 1.25rem);
+        padding: 0 var(--space-md);
+    }
+
+    .admin-panel {
+        bottom: var(--space-sm);
+        right: var(--space-sm);
+    }
+
+    .admin-input {
+        font-size: 0.875rem;
+        padding: 0.6rem var(--space-sm);
+        width: 180px;
+        /* Ensure minimum tap target */
+        min-height: 44px;
+    }
+}
+
+/* Tablet Breakpoint */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .day-info .day-name {
+        font-size: clamp(1.8rem, 4vw, 2.3rem);
+    }
+
+    .experience-ui .instruction {
+        font-size: 1.1rem;
+    }
+
+    .countdown .time {
+        font-size: 1.3rem;
+    }
+}
+
+/* Portrait Orientation - Vertical screens */
+@media screen and (orientation: portrait) and (max-width: 768px) {
+    .day-info {
+        bottom: var(--space-sm);
+    }
+
+    .countdown {
+        opacity: 0.7;
+    }
+
+    .countdown .time {
+        font-size: 1rem;
+    }
+}
+
+/* Landscape Orientation on Mobile */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .day-info {
+        bottom: var(--space-sm);
+    }
+
+    .day-info .day-name {
+        font-size: 1.5rem;
+    }
+
+    .experience-ui .instruction {
+        bottom: var(--space-sm);
+        font-size: 1rem;
+    }
+
+    .exit-button {
+        top: var(--space-xs);
+        left: var(--space-xs);
+    }
+
+    .countdown {
+        top: var(--space-xs);
+        right: var(--space-xs);
+    }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    body {
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
