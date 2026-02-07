@@ -32,11 +32,13 @@ class Capsule {
 
         // Create material based on state (will be updated)
         this.material = new THREE.MeshStandardMaterial({
-            color: COLORS_HEX.champagneGold,
-            metalness: 0.3,
-            roughness: 0.6,
+            color: COLORS_HEX.champagneGold, // Neon Cyan
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: COLORS_HEX.champagneGold,
+            emissiveIntensity: 0.2,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.9
         });
 
         this.mesh = new THREE.Mesh(geometry, this.material);
@@ -91,9 +93,9 @@ class Capsule {
         varying vec3 vPosition;
         
         void main() {
-          float pulse = sin(uTime * 2.0) * 0.15 + 0.85;
-          float rim = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
-          float alpha = rim * uIntensity * pulse;
+          float pulse = sin(uTime * 3.0) * 0.2 + 0.8;
+          float rim = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.5); // Sharper rim
+          float alpha = rim * uIntensity * pulse * 1.5; // Brighter
           gl_FragColor = vec4(uColor, alpha);
         }
       `,

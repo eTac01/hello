@@ -3,21 +3,30 @@
  * Color palette, timeline, and configuration
  */
 
-// STRICT Color Palette
+// Cyberpunk/Neon Color Palette (Inspired by Jesse Zhou)
 export const COLORS = {
-    charcoal: '#0b0b0f',
-    charcoalRGB: { r: 11, g: 11, b: 15 },
-    roseRed: '#e63946',
-    roseRedRGB: { r: 230, g: 57, b: 70 },
-    champagneGold: '#f1c27d',
-    champagneGoldRGB: { r: 241, g: 194, b: 125 }
+    charcoal: '#120c18',        // Deep purple/black void
+    charcoalRGB: { r: 18, g: 12, b: 24 },
+    roseRed: '#ff00ff',         // Neon Magenta/Pink
+    roseRedRGB: { r: 255, g: 0, b: 255 },
+    champagneGold: '#00ffff',   // Neon Cyan (replacing gold for cool tone)
+    champagneGoldRGB: { r: 0, g: 255, b: 255 },
+    neonYellow: '#ffe600',      // Electric Yellow (Accents)
+    neonYellowRGB: { r: 255, g: 230, b: 0 },
+    softWhite: '#ffffff',       // Pure white for high contrast
+    softWhiteRGB: { r: 255, g: 255, b: 255 },
+    deepPurple: '#2d1b4e',      // Secondary richness
+    deepPurpleRGB: { r: 45, g: 27, b: 78 }
 };
 
 // Three.js compatible colors (0x hex)
 export const COLORS_HEX = {
-    charcoal: 0x0b0b0f,
-    roseRed: 0xe63946,
-    champagneGold: 0xf1c27d
+    charcoal: 0x120c18,
+    roseRed: 0xff00ff,
+    champagneGold: 0x00ffff,
+    neonYellow: 0xffe600,
+    softWhite: 0xffffff,
+    deepPurple: 0x2d1b4e
 };
 
 // Valentine's Week Timeline (Hard-Coded)

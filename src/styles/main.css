@@ -1,23 +1,38 @@
 /**
  * Valentine's Week 2026 — Main Styles
- * Ultra-minimal, cinematic, premium design
+ * Cyberpunk/Neon "Clear and Cool" Design
  */
 
-:root {
-    /* STRICT Color Palette */
-    --charcoal: #0b0b0f;
-    --rose-red: #e63946;
-    --champagne-gold: #f1c27d;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Patrick+Hand&family=Inter:wght@300;400;600&display=swap');
 
-    /* Opacity variants */
-    --rose-red-30: rgba(230, 57, 70, 0.3);
-    --rose-red-50: rgba(230, 57, 70, 0.5);
-    --champagne-gold-30: rgba(241, 194, 125, 0.3);
-    --champagne-gold-50: rgba(241, 194, 125, 0.5);
+:root {
+    /* Cyberpunk/Neon Color Palette */
+    --charcoal: #120c18;
+    /* Deep void background */
+    --rose-red: #ff00ff;
+    /* Neon Magenta */
+    --champagne-gold: #00ffff;
+    /* Neon Cyan */
+    --neon-yellow: #ffe600;
+    /* Electric Yellow */
+    --soft-white: #ffffff;
+    /* Pure white */
+    --deep-purple: #2d1b4e;
+    /* Deep purple accent */
+
+    /* Opacity variants for Glows */
+    --rose-red-30: rgba(255, 0, 255, 0.3);
+    --rose-red-50: rgba(255, 0, 255, 0.5);
+    --champagne-gold-30: rgba(0, 255, 255, 0.3);
+    --champagne-gold-50: rgba(0, 255, 255, 0.5);
 
     /* Typography */
-    --font-display: 'Cormorant Garamond', serif;
+    --font-display: 'Orbitron', sans-serif;
+    /* Sci-fi headers */
+    --font-hand: 'Patrick Hand', cursive;
+    /* Playful labels */
     --font-body: 'Inter', sans-serif;
+    /* Clean body */
 
     /* Spacing */
     --space-xs: 0.5rem;
@@ -29,7 +44,7 @@
     /* Transitions */
     --transition-slow: 1s cubic-bezier(0.16, 1, 0.3, 1);
     --transition-medium: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-fast: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: 0.3s ease-out;
 }
 
 /* Reset */
@@ -56,9 +71,48 @@ body {
     cursor: none;
 }
 
-/* Hide default cursor */
-* {
-    cursor: none !important;
+/* Custom Cyberpunk Cursor */
+
+#cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--champagne-gold);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+        height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.3s;
+}
+
+#cursor::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: var(--rose-red);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#cursor.hover {
+    width: 50px;
+    height: 50px;
+    background-color: var(--champagne-gold-30);
+    border-color: var(--rose-red);
+    box-shadow: 0 0 15px var(--rose-red-50);
+}
+
+#cursor.active {
+    transform: translate(-50%, -50%) scale(0.8);
+    background-color: var(--champagne-gold);
 }
 
 /* Typography */
@@ -69,17 +123,21 @@ h4,
 h5,
 h6 {
     font-family: var(--font-display);
-    font-weight: 300;
-    letter-spacing: 0.05em;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px var(--rose-red-50);
+    text-transform: uppercase;
 }
 
 .display-text {
     font-family: var(--font-display);
     font-size: clamp(2rem, 5vw, 4rem);
-    font-weight: 300;
-    font-style: italic;
+    font-weight: 700;
+    font-style: normal;
     line-height: 1.4;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
+    color: var(--soft-white);
+    text-shadow: 0 0 15px var(--champagne-gold-50);
 }
 
 .body-text {
@@ -87,15 +145,15 @@ h6 {
     font-size: 1rem;
     font-weight: 300;
     line-height: 1.8;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
 }
 
 .label-text {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
+    font-family: var(--font-hand);
+    font-size: 1.25rem;
     font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.1em;
+    color: var(--neon-yellow);
 }
 
 /* Day Info Overlay */
@@ -118,18 +176,19 @@ h6 {
 .day-info .day-name {
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 3vw, 2.5rem);
-    font-weight: 300;
-    color: var(--champagne-gold);
+    font-weight: 700;
+    color: var(--rose-red);
     margin-bottom: var(--space-xs);
+    text-shadow: 0 0 10px var(--rose-red-50), 0 0 20px var(--rose-red-30);
 }
 
 .day-info .day-theme {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 300;
-    color: var(--rose-red);
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--champagne-gold);
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 5px var(--champagne-gold-50);
 }
 
 /* Capsule Labels */

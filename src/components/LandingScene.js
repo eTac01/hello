@@ -29,6 +29,9 @@ class LandingScene {
         // Add ring group to scene
         this.sceneManager.scene.add(this.ringGroup);
 
+        // Cyberpunk Environment
+        this.createEnvironment();
+
         // Create capsules
         this.createCapsules();
 
@@ -37,13 +40,56 @@ class LandingScene {
 
         // Setup interaction
         this.setupInteraction();
+        this.setupDoubleClickInteraction();
 
         // Register update callback
         this.unsubscribeUpdate = this.sceneManager.onUpdate(this.update.bind(this));
 
-        // Initial camera position
-        this.sceneManager.camera.position.set(0, 3, 10);
+        // Initial camera position (Adjusted for better view of floor)
+        this.sceneManager.camera.position.set(0, 4, 12);
         this.sceneManager.camera.lookAt(0, 0, 0);
+
+        // Add fog for depth
+        this.sceneManager.scene.fog = new THREE.FogExp2(COLORS_HEX.charcoal, 0.02);
+    }
+
+    /**
+     * Create Cyberpunk Environment (Grid + Floor)
+     */
+    createEnvironment() {
+        // 1. Neon Grid Floor
+        const gridHelper = new THREE.GridHelper(40, 40, COLORS_HEX.roseRed, COLORS_HEX.deepPurple);
+        gridHelper.position.y = -2;
+        gridHelper.material.opacity = 0.3;
+        gridHelper.material.transparent = true;
+        this.sceneManager.scene.add(gridHelper);
+
+        // 2. Reflective "Wet" Floor
+        const planeGeometry = new THREE.PlaneGeometry(100, 100);
+        const planeMaterial = new THREE.MeshStandardMaterial({
+            color: COLORS_HEX.charcoal,
+            roughness: 0.1,
+            metalness: 0.8,
+            transparent: true,
+            opacity: 0.8
+        });
+        const floor = new THREE.Mesh(planeGeometry, planeMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -2.01; // Just below grid
+        this.sceneManager.scene.add(floor);
+
+        // 3. Ambient Light for floor reflections
+        const ambientLight = new THREE.AmbientLight(COLORS_HEX.deepPurple, 2.0);
+        this.sceneManager.scene.add(ambientLight);
+
+        // 4. Point lights for neon glow spots
+        const blueLight = new THREE.PointLight(COLORS_HEX.champagneGold, 2, 20);
+        blueLight.position.set(5, 2, 5);
+        this.sceneManager.scene.add(blueLight);
+
+        const pinkLight = new THREE.PointLight(COLORS_HEX.roseRed, 2, 20);
+        pinkLight.position.set(-5, 2, 5);
+        this.sceneManager.scene.add(pinkLight);
     }
 
     /**
@@ -467,6 +513,36 @@ class LandingScene {
 
         if (this.ringGroup.parent) {
             this.sceneManager.scene.remove(this.ringGroup);
+        }
+    }
+
+    setupDoubleClickInteraction() {
+        window.addEventListener('dblclick', () => {
+            this.triggerTimeAcceleration();
+        });
+    }
+
+    triggerTimeAcceleration() {
+        // Rotate ring faster
+        gsap.to(this.ringGroup.rotation, {
+            y: this.ringGroup.rotation.y + Math.PI * 2,
+            duration: 2,
+            ease: 'power4.inOut'
+        });
+
+        // Pulse center
+        if (this.centerPoint) {
+            gsap.fromTo(this.centerPoint.scale,
+                { x: 1, y: 1, z: 1 },
+                { x: 2, y: 2, z: 2, duration: 1, yoyo: true, repeat: 1, ease: 'power2.inOut' }
+            );
+        }
+
+        // Flash effect
+        if (this.centerPoint && this.centerPoint.material.uniforms) {
+            gsap.to(this.centerPoint.material.uniforms.uColor1.value, {
+                r: 1, g: 1, b: 1, duration: 0.2, yoyo: true, repeat: 3
+            });
         }
     }
 }

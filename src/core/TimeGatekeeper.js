@@ -106,21 +106,12 @@ class TimeGatekeeper {
 
     /**
      * Check if experience can be entered
+     * Users can visit unlimited times during the active calendar day (12:00 AM - 11:59 PM)
      */
     canEnterExperience(dayIndex) {
         const state = this.getCapsuleState(dayIndex);
-        if (state !== 'active') return false;
-
-        // Check if already visited today (anti-replay)
-        const visitKey = `valentine_visited_${TIMELINE[dayIndex].date}`;
-        const visited = localStorage.getItem(visitKey);
-
-        if (visited && !this.adminMode) {
-            // Already completed this experience
-            return false;
-        }
-
-        return true;
+        // Only check if the day is active (current calendar day from 12:00 AM to 11:59 PM)
+        return state === 'active';
     }
 
     /**

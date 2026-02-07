@@ -55,8 +55,48 @@ class App {
         // Start render loop
         this.sceneManager.start();
 
+        // Create custom cursor
+        this.createCursor();
+
         // Hide loading screen
         this.hideLoadingScreen();
+    }
+
+    createCursor() {
+        const cursor = document.createElement('div');
+        cursor.id = 'cursor';
+        document.body.appendChild(cursor);
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursor.classList.add('active');
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.classList.remove('active');
+        });
+
+        // Add hover effect for interactive elements
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.tagName === 'BUTTON' ||
+                e.target.tagName === 'A' ||
+                e.target.closest('.interactive')) {
+                cursor.classList.add('hover');
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.tagName === 'BUTTON' ||
+                e.target.tagName === 'A' ||
+                e.target.closest('.interactive')) {
+                cursor.classList.remove('hover');
+            }
+        });
+
 
         // Setup admin panel
         this.setupAdminPanel();
