@@ -116,6 +116,20 @@ class RoseDay extends BaseExperience {
             .lets-go-btn:active {
                 transform: scale(0.95);
             }
+            
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                .lets-go-btn {
+                    font-size: 1.2rem;
+                    padding: 12px 30px;
+                }
+            }
+            @media (max-width: 480px) {
+                .lets-go-btn {
+                    font-size: 1rem;
+                    padding: 10px 25px;
+                }
+            }
         `;
         document.head.appendChild(style);
         document.body.appendChild(this.buttonElement);
@@ -395,6 +409,39 @@ class RoseDay extends BaseExperience {
             .option-btn.wrong {
                 background: rgba(255, 0, 0, 0.3);
                 border-color: #ff0000;
+            }
+            
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .quiz-card {
+                    padding: 30px 20px;
+                    width: 95%;
+                }
+                .quiz-header {
+                    font-size: 1.5rem;
+                }
+                .question-text {
+                    font-size: 1.2rem;
+                }
+                .option-btn {
+                    font-size: 1rem;
+                    padding: 12px 15px;
+                }
+            }
+            @media (max-width: 480px) {
+                .quiz-card {
+                    padding: 20px 15px;
+                }
+                .quiz-header {
+                    font-size: 1.3rem;
+                }
+                .question-text {
+                    font-size: 1.1rem;
+                }
+                .option-btn {
+                    font-size: 0.9rem;
+                    padding: 10px 12px;
+                }
             }
         `;
         document.head.appendChild(style);
