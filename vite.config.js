@@ -19,7 +19,7 @@ export default defineConfig({
       }
     }
   ],
-  base: '/', // Use root path for custom domain
+  base: '/hello/', // GitHub Pages repository name
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
