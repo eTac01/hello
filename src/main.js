@@ -7,6 +7,7 @@ import './styles/main.css';
 import './styles/emoji-animations.css';
 import SceneManager from './core/SceneManager.js';
 import { timeGatekeeper } from './core/TimeGatekeeper.js';
+import SmoothCursor from './core/SmoothCursor.js';
 import LandingScene from './components/LandingScene.js';
 import { TIMELINE } from './utils/constants.js';
 
@@ -57,52 +58,13 @@ class App {
         this.sceneManager.start();
 
         // Create custom cursor
-        this.createCursor();
-
-        // Hide loading screen
-        this.hideLoadingScreen();
-    }
-
-    createCursor() {
-        const cursor = document.createElement('div');
-        cursor.id = 'cursor';
-        document.body.appendChild(cursor);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.classList.add('active');
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.classList.remove('active');
-        });
-
-        // Add hover effect for interactive elements
-        document.addEventListener('mouseover', (e) => {
-            if (e.target.tagName === 'BUTTON' ||
-                e.target.tagName === 'A' ||
-                e.target.closest('.interactive')) {
-                cursor.classList.add('hover');
-            }
-        });
-
-        document.addEventListener('mouseout', (e) => {
-            if (e.target.tagName === 'BUTTON' ||
-                e.target.tagName === 'A' ||
-                e.target.closest('.interactive')) {
-                cursor.classList.remove('hover');
-            }
-        });
-
-
-
+        this.cursor = new SmoothCursor();
 
         // Setup countdown
         this.setupCountdown();
+
+        // Hide loading screen
+        this.hideLoadingScreen();
 
         this.isInitialized = true;
     }
@@ -408,8 +370,6 @@ class App {
             this.landingScene.returnFromExperience();
         }
     }
-
-
 
     setupCountdown() {
         const updateCountdown = () => {
