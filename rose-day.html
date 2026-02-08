@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Language of Roses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@200;300;400;500;600&family=Spectral:wght@200;300;400&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --wine-night: #1a0d14;
+            --deep-rose: #8b2e3f;
+            --blush-pink: #e6b8c2;
+            --pearl-white: #fef9f8;
+            --soft-gold: #d4a574;
+            --midnight-wine: #2d1823;
+        }
+
+        body {
+            font-family: 'Spectral', serif;
+            background: var(--wine-night);
+            color: var(--pearl-white);
+            overflow-x: hidden;
+            cursor: none;
+            position: relative;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--blush-pink);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            mix-blend-mode: screen;
+            opacity: 0.6;
+        }
+
+        .cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: var(--blush-pink);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor.hover {
+            transform: scale(2);
+            opacity: 1;
+            border-color: var(--soft-gold);
+        }
+
+        .cursor.hover::before {
+            background: var(--soft-gold);
+        }
+
+        /* Background Environment */
+        .environment {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .gradient-base {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 20%, rgba(139, 46, 63, 0.15), transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(45, 24, 35, 0.2), transparent 60%),
+                linear-gradient(165deg, var(--wine-night) 0%, var(--midnight-wine) 50%, var(--wine-night) 100%);
+        }
+
+        .fog {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(230, 184, 194, 0.03), transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(230, 184, 194, 0.02), transparent 30%);
+            animation: fogDrift 60s ease-in-out infinite;
+        }
+
+        @keyframes fogDrift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(3%, 3%) rotate(1deg); }
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--blush-pink);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatParticle 12s infinite ease-in-out;
+            filter: blur(0.5px);
+        }
+
+        @keyframes floatParticle {
+            0%, 100% { 
+                opacity: 0; 
+                transform: translateY(100vh) translateX(0) scale(0);
+            }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.3; }
+            100% { 
+                transform: translateY(-10vh) translateX(var(--drift-x)) scale(1);
+            }
+        }
+
+        /* Petal System */
+        .petal {
+            position: fixed;
+            font-size: 20px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes petalFall {
+            0% { 
+                opacity: 0;
+                transform: translateY(-20px) rotate(0deg) scale(0.5);
+            }
+            10% { opacity: 1; }
+            90% { opacity: 0.8; }
+            100% { 
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg) translateX(var(--drift)) scale(1);
+            }
+        }
+
+        /* Main Container */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Stages */
+        .stage {
+            display: none;
+            opacity: 0;
+            animation: stageReveal 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .stage.active {
+            display: block;
+        }
+
+        @keyframes stageReveal {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        .poetry {
+            font-family: 'Crimson Pro', serif;
+            font-size: clamp(1.8rem, 5vw, 3.5rem);
+            font-weight: 200;
+            line-height: 1.5;
+            letter-spacing: 0.02em;
+            margin-bottom: 3rem;
+            color: var(--pearl-white);
+        }
+
+        .poetry-line {
+            display: block;
+            opacity: 0;
+            animation: lineReveal 1.5s ease forwards;
+        }
+
+        @keyframes lineReveal {
+            to { opacity: 1; }
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            font-weight: 300;
+            color: var(--blush-pink);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 1.5s ease forwards 0.5s;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Rose Bud (Stage 1) */
+        .rose-bud {
+            width: 150px;
+            height: 150px;
+            margin: 3rem auto;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rose-bud:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .bud-core {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--deep-rose), var(--blush-pink));
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            box-shadow: 
+                0 10px 30px rgba(139, 46, 63, 0.4),
+                inset 0 -20px 30px rgba(0, 0, 0, 0.2);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .bud-glow {
+            position: absolute;
+            inset: -20px;
+            background: radial-gradient(circle, rgba(230, 184, 194, 0.3), transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .rose-bud:hover .bud-glow {
+            opacity: 1;
+            animation: pulseGlow 2s ease infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+        }
+
+        /* Blooming Rose (Stage 2) */
+        .blooming-rose {
+            width: 300px;
+            height: 300px;
+            margin: 3rem auto;
+            position: relative;
+            cursor: default;
+        }
+
+        .rose-center {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--soft-gold), var(--deep-rose));
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.5);
+            z-index: 10;
+        }
+
+        .petal-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .petal-piece {
+            position: absolute;
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--deep-rose), var(--blush-pink));
+            border-radius: 50% 50% 20% 20%;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            opacity: 0;
+            box-shadow: 
+                0 5px 15px rgba(139, 46, 63, 0.3),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .petal-piece:hover {
+            transform: translate(-50%, -60%) scale(1.15) !important;
+            filter: brightness(1.3);
+            box-shadow: 
+                0 10px 25px rgba(212, 165, 116, 0.5),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .petal-piece.bloomed {
+            opacity: 1;
+            animation: petalPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes petalPulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.1); }
+        }
+
+        .petal-piece.revealed {
+            background: linear-gradient(135deg, var(--soft-gold), var(--blush-pink));
+            box-shadow: 
+                0 10px 30px rgba(212, 165, 116, 0.6),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .petal-text {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--pearl-white);
+            white-space: nowrap;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .petal-piece:hover .petal-text,
+        .petal-piece.revealed .petal-text {
+            opacity: 1;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: linear-gradient(135deg, rgba(139, 46, 63, 0.15), rgba(45, 24, 35, 0.15));
+            padding: 2.5rem;
+            border-radius: 30px;
+            border: 1px solid rgba(230, 184, 194, 0.2);
+            backdrop-filter: blur(20px);
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .question-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-weight: 400;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            color: var(--pearl-white);
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .answer-btn {
+            padding: 1.2rem 2rem;
+            background: linear-gradient(135deg, rgba(139, 46, 63, 0.2), rgba(212, 165, 116, 0.2));
+            border: 2px solid transparent;
+            border-radius: 20px;
+            color: var(--pearl-white);
+            font-family: 'Spectral', serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--blush-pink), var(--soft-gold));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .answer-btn:hover {
+            border-color: var(--blush-pink);
+            transform: translateX(10px);
+        }
+
+        .answer-btn:hover::before {
+            opacity: 0.2;
+        }
+
+        .answer-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .answer-btn.selected {
+            border-color: var(--soft-gold);
+            background: linear-gradient(135deg, rgba(139, 46, 63, 0.4), rgba(212, 165, 116, 0.4));
+        }
+
+        /* Rose Color Selector */
+        .color-palette {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .color-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .color-option:hover {
+            transform: translateY(-10px);
+        }
+
+        .color-rose {
+            font-size: 4rem;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+            transition: all 0.4s ease;
+        }
+
+        .color-option:hover .color-rose {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .color-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--blush-pink);
+        }
+
+        .color-meaning {
+            font-size: 0.95rem;
+            color: var(--pearl-white);
+            opacity: 0;
+            max-width: 200px;
+            text-align: center;
+            transition: opacity 0.4s ease;
+            line-height: 1.5;
+        }
+
+        .color-option:hover .color-meaning {
+            opacity: 1;
+        }
+
+        /* Memory Match Game */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--deep-rose), var(--midnight-wine));
+            border: 2px solid var(--blush-pink);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .memory-card:hover {
+            transform: scale(1.05);
+        }
+
+        .memory-card .front,
+        .memory-card .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            border-radius: 15px;
+        }
+
+        .memory-card .front {
+            background: linear-gradient(135deg, var(--deep-rose), var(--midnight-wine));
+        }
+
+        .memory-card .back {
+            background: linear-gradient(135deg, var(--blush-pink), var(--soft-gold));
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(135deg, var(--soft-gold), var(--blush-pink));
+            border-color: var(--soft-gold);
+            pointer-events: none;
+            animation: matchPulse 0.6s ease;
+        }
+
+        @keyframes matchPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Drag and Drop Garden */
+        .garden-plot {
+            min-height: 300px;
+            background: linear-gradient(135deg, rgba(45, 24, 35, 0.3), rgba(139, 46, 63, 0.2));
+            border: 2px dashed var(--blush-pink);
+            border-radius: 30px;
+            padding: 2rem;
+            margin: 2rem auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .garden-plot.has-roses {
+            border-style: solid;
+            border-color: var(--soft-gold);
+            background: linear-gradient(135deg, rgba(139, 46, 63, 0.3), rgba(212, 165, 116, 0.2));
+        }
+
+        .draggable-rose {
+            font-size: 3rem;
+            cursor: move;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+            padding: 0.5rem;
+        }
+
+        .draggable-rose:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .draggable-rose.dragging {
+            opacity: 0.5;
+        }
+
+        .available-roses {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        /* Rose Grid for Number Meanings */
+        .rose-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+
+        .rose-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, rgba(139, 46, 63, 0.2), rgba(45, 24, 35, 0.2));
+            border: 2px solid rgba(230, 184, 194, 0.2);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rose-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(230, 184, 194, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .rose-card:hover::before {
+            opacity: 1;
+        }
+
+        .rose-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--blush-pink);
+        }
+
+        .rose-card.matched {
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.4), rgba(230, 184, 194, 0.4));
+            border-color: var(--soft-gold);
+        }
+
+        .rose-emoji {
+            font-size: 3rem;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+
+        .rose-label {
+            font-size: 0.9rem;
+            color: var(--blush-pink);
+            margin-top: 0.5rem;
+            font-weight: 300;
+        }
+
+        /* Rose Counter */
+        .rose-counter {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.2rem;
+            color: var(--soft-gold);
+            margin: 1rem 0;
+        }
+
+        /* Continue Button */
+        .continue-btn {
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--deep-rose), var(--soft-gold));
+            border: 2px solid var(--soft-gold);
+            border-radius: 50px;
+            color: var(--pearl-white);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 2rem;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .continue-btn.visible {
+            opacity: 1;
+            pointer-events: all;
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(212, 165, 116, 0.4);
+        }
+
+        /* Final Bouquet */
+        .bouquet-display {
+            margin: 3rem auto;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bouquet-roses {
+            font-size: 5rem;
+            display: flex;
+            gap: 0.5rem;
+            filter: drop-shadow(0 15px 30px rgba(139, 46, 63, 0.5));
+            animation: bouquetGlow 3s ease-in-out infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes bouquetGlow {
+            0%, 100% { filter: drop-shadow(0 15px 30px rgba(139, 46, 63, 0.5)); }
+            50% { filter: drop-shadow(0 15px 40px rgba(212, 165, 116, 0.6)); }
+        }
+
+        .bouquet-roses span {
+            display: inline-block;
+            animation: roseArrive 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes roseArrive {
+            0% { opacity: 0; transform: translateY(50px) scale(0); }
+            70% { transform: translateY(-10px) scale(1.1); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .final-message {
+            background: linear-gradient(135deg, rgba(139, 46, 63, 0.3), rgba(212, 165, 116, 0.3));
+            padding: 3rem 2rem;
+            border-radius: 30px;
+            border: 2px solid var(--soft-gold);
+            backdrop-filter: blur(20px);
+            max-width: 700px;
+            margin: 2rem auto;
+        }
+
+        .final-message p {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Progress Indicator */
+        .progress-tracker {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(230, 184, 194, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .progress-dot.completed {
+            background: var(--soft-gold);
+            box-shadow: 0 0 10px rgba(212, 165, 116, 0.5);
+        }
+
+        .progress-dot.active {
+            background: var(--blush-pink);
+            transform: scale(1.3);
+        }
+
+        /* Loading Screen */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--wine-night);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 2rem;
+            transition: opacity 1.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-rose {
+            font-size: 5rem;
+            animation: roseBloom 3s ease-in-out infinite;
+        }
+
+        @keyframes roseBloom {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+            50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+        }
+
+        .loading-text {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--blush-pink);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cursor { display: none; }
+            body { cursor: auto; }
+            .answer-btn, .rose-card, .memory-card, .color-option, .continue-btn, .draggable-rose, .rose-bud, .petal-piece { cursor: pointer; }
+            
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .rose-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .color-palette {
+                gap: 1rem;
+            }
+
+            .color-rose {
+                font-size: 3rem;
+            }
+
+            .petal-text {
+                opacity: 0.8;
+            }
+        }
+
+        /* Heartbeat pulse */
+        .heartbeat-pulse {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 46, 63, 0.1), transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: heartbeat 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading">
+        <div class="loading-rose">🌹</div>
+        <div class="loading-text">Cultivating your garden...</div>
+    </div>
+
+    <!-- Background Environment -->
+    <div class="environment">
+        <div class="gradient-base"></div>
+        <div class="fog"></div>
+        <div class="heartbeat-pulse"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Stage 1: Welcome - Rose Bud -->
+        <div class="stage active" id="stage1">
+            <div class="poetry">
+                <span class="poetry-line">Some feelings don't need words.</span><br>
+                <span class="poetry-line">They bloom on their own.</span>
+            </div>
+            <div class="rose-bud" id="roseBud">
+                <div class="bud-glow"></div>
+                <div class="bud-core"></div>
+            </div>
+            <p class="subtitle">Touch the rose to wake it</p>
+        </div>
+
+        <!-- Stage 2: Blooming Rose - Petal Emotions -->
+        <div class="stage" id="stage2">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">Each petal holds a truth</span>
+            </div>
+            <div class="blooming-rose" id="bloomingRose">
+                <div class="rose-center"></div>
+                <div class="petal-layer" id="petalLayer"></div>
+            </div>
+            <p class="subtitle" id="bloomInstruction">Touch each petal to reveal its meaning · <span id="petalCounter">0/6</span></p>
+        </div>
+
+        <!-- Stage 3: Question - What roses mean to you -->
+        <div class="stage" id="stage3">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">A question for your heart...</span>
+            </div>
+            <div class="question-card">
+                <p class="question-text">When you see a rose, what do you feel first?</p>
+                <div class="answer-options">
+                    <button class="answer-btn" onclick="selectAnswer(this, 3, 'Beauty')">
+                        <span>🌸 Its beauty takes my breath away</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 3, 'Story')">
+                        <span>💭 I wonder about the story behind it</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 3, 'Care')">
+                        <span>💗 I think of the care it took to grow</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 3, 'Love')">
+                        <span>✨ I remember someone special</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 4: Rose Color Meanings -->
+        <div class="stage" id="stage4">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">Every color carries a secret...</span>
+            </div>
+            <p class="subtitle">Hover over each rose to discover its meaning</p>
+            <div class="color-palette" id="colorPalette">
+                <div class="color-option" onclick="selectColor(this, '🌹', 'Red', 'Deep love and passion')">
+                    <div class="color-rose">🌹</div>
+                    <div class="color-name">Red Rose</div>
+                    <p class="color-meaning">Deep love and passion — "You are my everything"</p>
+                </div>
+                <div class="color-option" onclick="selectColor(this, '🌸', 'Pink', 'Grace and joy')">
+                    <div class="color-rose">🌸</div>
+                    <div class="color-name">Pink Rose</div>
+                    <p class="color-meaning">Grace and joy — "You make me smile effortlessly"</p>
+                </div>
+                <div class="color-option" onclick="selectColor(this, '🤍', 'White', 'Pure devotion')">
+                    <div class="color-rose">🤍</div>
+                    <div class="color-name">White Rose</div>
+                    <p class="color-meaning">Pure devotion — "My feelings are honest and true"</p>
+                </div>
+                <div class="color-option" onclick="selectColor(this, '🌼', 'Yellow', 'Friendship and warmth')">
+                    <div class="color-rose">🌼</div>
+                    <div class="color-name">Yellow Rose</div>
+                    <p class="color-meaning">Friendship and warmth — "You brighten my days"</p>
+                </div>
+                <div class="color-option" onclick="selectColor(this, '🌺', 'Lavender', 'Enchantment')">
+                    <div class="color-rose">🌺</div>
+                    <div class="color-name">Lavender Rose</div>
+                    <p class="color-meaning">Enchantment — "I'm captivated by you"</p>
+                </div>
+                <div class="color-option" onclick="selectColor(this, '🥀', 'Peach', 'Gratitude')">
+                    <div class="color-rose">🥀</div>
+                    <div class="color-name">Peach Rose</div>
+                    <p class="color-meaning">Gratitude — "Thank you for being you"</p>
+                </div>
+            </div>
+            <p class="rose-counter" id="colorCounter">Touch 3 roses to continue</p>
+            <button class="continue-btn" id="colorContinue" onclick="nextStage(5)">Continue →</button>
+        </div>
+
+        <!-- Stage 5: Memory Matching Game -->
+        <div class="stage" id="stage5">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">Can you remember?</span>
+            </div>
+            <p class="subtitle">Match the pairs of roses — just like finding connections in love</p>
+            <div class="memory-grid" id="memoryGrid"></div>
+            <p class="rose-counter" id="memoryCounter">Matches found: 0/6</p>
+            <button class="continue-btn" id="memoryContinue" onclick="nextStage(6)">Continue →</button>
+        </div>
+
+        <!-- Stage 6: Question - Perfect moment -->
+        <div class="stage" id="stage6">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">Imagine this...</span>
+            </div>
+            <div class="question-card">
+                <p class="question-text">If I gave you a single rose, what would make the moment perfect?</p>
+                <div class="answer-options">
+                    <button class="answer-btn" onclick="selectAnswer(this, 6, 'Eyes')">
+                        <span>👀 Looking into your eyes as I hand it to you</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 6, 'Words')">
+                        <span>💌 Saying exactly how I feel</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 6, 'Surprise')">
+                        <span>✨ The complete surprise of it</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 6, 'Silence')">
+                        <span>🤫 No words needed — the rose says everything</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 7: Create Your Garden -->
+        <div class="stage" id="stage7">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">Plant your garden</span>
+            </div>
+            <p class="subtitle">Drag and drop roses to create your perfect bouquet</p>
+            <div class="available-roses" id="availableRoses">
+                <div class="draggable-rose" draggable="true">🌹</div>
+                <div class="draggable-rose" draggable="true">🌸</div>
+                <div class="draggable-rose" draggable="true">🤍</div>
+                <div class="draggable-rose" draggable="true">🌼</div>
+                <div class="draggable-rose" draggable="true">🌺</div>
+                <div class="draggable-rose" draggable="true">🥀</div>
+            </div>
+            <div class="garden-plot" id="gardenPlot">
+                <p style="opacity: 0.5; font-style: italic;">Drag roses here...</p>
+            </div>
+            <p class="rose-counter" id="gardenCounter">Add at least 3 roses</p>
+            <button class="continue-btn" id="gardenContinue" onclick="nextStage(8)">Continue →</button>
+        </div>
+
+        <!-- Stage 8: Rose Number Meaning -->
+        <div class="stage" id="stage8">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">Did you know?</span>
+            </div>
+            <div class="question-card">
+                <p class="question-text">The number of roses has meaning too...</p>
+                <div class="rose-grid">
+                    <div class="rose-card" onclick="selectRoseNumber(this, 1)">
+                        <div class="rose-emoji">🌹</div>
+                        <div class="rose-label">One</div>
+                    </div>
+                    <div class="rose-card" onclick="selectRoseNumber(this, 3)">
+                        <div class="rose-emoji">🌹🌹🌹</div>
+                        <div class="rose-label">Three</div>
+                    </div>
+                    <div class="rose-card" onclick="selectRoseNumber(this, 5)">
+                        <div class="rose-emoji" style="font-size: 2rem;">🌹🌹🌹🌹🌹</div>
+                        <div class="rose-label">Five</div>
+                    </div>
+                    <div class="rose-card" onclick="selectRoseNumber(this, 7)">
+                        <div class="rose-emoji" style="font-size: 1.8rem;">🌹🌹🌹🌹🌹🌹🌹</div>
+                        <div class="rose-label">Seven</div>
+                    </div>
+                    <div class="rose-card" onclick="selectRoseNumber(this, 12)">
+                        <div class="rose-emoji" style="font-size: 1.5rem;">🌹x12</div>
+                        <div class="rose-label">Dozen</div>
+                    </div>
+                    <div class="rose-card" onclick="selectRoseNumber(this, 99)">
+                        <div class="rose-emoji" style="font-size: 1.5rem;">🌹x99</div>
+                        <div class="rose-label">Eternity</div>
+                    </div>
+                </div>
+                <p class="subtitle" id="numberMeaning" style="margin-top: 2rem; min-height: 60px;">Click a number to see its meaning...</p>
+            </div>
+            <button class="continue-btn visible" style="margin-top: 1rem;" onclick="nextStage(9)">Continue →</button>
+        </div>
+
+        <!-- Stage 9: Final Question -->
+        <div class="stage" id="stage9">
+            <div class="poetry" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
+                <span class="poetry-line">One last thing...</span>
+            </div>
+            <div class="question-card">
+                <p class="question-text">If these roses could speak your heart, what would they say?</p>
+                <div class="answer-options">
+                    <button class="answer-btn" onclick="selectAnswer(this, 9, 'Thank you')">
+                        <span>🙏 Thank you for being in my life</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 9, 'I care')">
+                        <span>💝 I care about you more than words can say</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 9, 'You matter')">
+                        <span>✨ You matter to me in ways I'm still learning</span>
+                    </button>
+                    <button class="answer-btn" onclick="selectAnswer(this, 9, 'Choose you')">
+                        <span>💗 I choose you, today and always</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 10: Final Reveal -->
+        <div class="stage" id="stage10">
+            <div class="poetry">
+                <span class="poetry-line">Every rose I've shown you,</span><br>
+                <span class="poetry-line">every meaning you've discovered,</span><br>
+                <span class="poetry-line">was leading here...</span>
+            </div>
+            <div class="bouquet-display">
+                <div class="bouquet-roses" id="finalBouquet"></div>
+            </div>
+            <div class="final-message">
+                <p>Roses don't ask for permission to bloom.</p>
+                <p>They simply grow toward the light.</p>
+                <p>That's what you are to me — light.</p>
+                <p>And these roses? They're my way of saying what I feel when I'm too overwhelmed to speak.</p>
+                <p style="margin-top: 2rem; color: var(--soft-gold); font-weight: 500;">Happy Rose Day 🌹</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="progress-tracker" id="progressTracker">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+    </div>
+
+    <script>
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        function setupHoverStates() {
+            document.querySelectorAll('.answer-btn, .rose-card, .memory-card, .color-option, .continue-btn, .draggable-rose, .rose-bud, .petal-piece').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+        }
+
+        // Create particles
+        function createParticles() {
+            const env = document.querySelector('.environment');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.setProperty('--drift-x', (Math.random() - 0.5) * 100 + 'px');
+                particle.style.animationDelay = Math.random() * 12 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 8) + 's';
+                env.appendChild(particle);
+            }
+        }
+
+        // Falling petals
+        function createFallingPetals(count = 15, emoji = '🌸') {
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.textContent = emoji;
+                petal.style.left = Math.random() * 100 + '%';
+                petal.style.top = '-30px';
+                petal.style.fontSize = (15 + Math.random() * 15) + 'px';
+                petal.style.setProperty('--drift', (Math.random() - 0.5) * 200 + 'px');
+                petal.style.animation = `petalFall ${4 + Math.random() * 4}s linear forwards`;
+                petal.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(petal);
+                
+                setTimeout(() => petal.remove(), 10000);
+            }
+        }
+
+        // Stage management
+        let currentStage = 1;
+        let userChoices = {};
+
+        function nextStage(num) {
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById('stage' + num).classList.add('active');
+            currentStage = num;
+
+            // Update progress tracker
+            updateProgress(num - 1);
+
+            // Reveal poetry lines
+            setTimeout(() => {
+                const lines = document.querySelectorAll('#stage' + num + ' .poetry-line');
+                lines.forEach((line, i) => {
+                    line.style.animationDelay = (i * 0.8) + 's';
+                });
+            }, 100);
+
+            createFallingPetals(10, '🌸');
+        }
+
+        function updateProgress(stage) {
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i < stage) {
+                    dot.classList.add('completed');
+                } else if (i === stage) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        // Stage 1: Rose Bud Click
+        document.getElementById('roseBud').addEventListener('click', () => {
+            createFallingPetals(8, '🌸');
+            playHeartbeat();
+            if (navigator.vibrate) navigator.vibrate(50);
+            setTimeout(() => {
+                nextStage(2);
+                createBloomingRose();
+            }, 800);
+        });
+
+        // Stage 2: Blooming Rose
+        const petalMeanings = [
+            { text: 'Comfort', angle: 0 },
+            { text: 'Warmth', angle: 60 },
+            { text: 'Safety', angle: 120 },
+            { text: 'Admiration', angle: 180 },
+            { text: 'Peace', angle: 240 },
+            { text: 'Joy', angle: 300 }
+        ];
+
+        let petalsRevealed = 0;
+
+        function createBloomingRose() {
+            const layer = document.getElementById('petalLayer');
+            
+            petalMeanings.forEach((petal, i) => {
+                setTimeout(() => {
+                    const petalEl = document.createElement('div');
+                    petalEl.className = 'petal-piece';
+                    petalEl.innerHTML = `<span class="petal-text">${petal.text}</span>`;
+                    
+                    const radius = 100;
+                    const x = Math.cos((petal.angle * Math.PI) / 180) * radius;
+                    const y = Math.sin((petal.angle * Math.PI) / 180) * radius;
+                    
+                    petalEl.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${petal.angle}deg)`;
+                    
+                    layer.appendChild(petalEl);
+                    
+                    setTimeout(() => {
+                        petalEl.classList.add('bloomed');
+                    }, 100);
+
+                    petalEl.addEventListener('click', () => {
+                        if (!petalEl.classList.contains('revealed')) {
+                            petalEl.classList.add('revealed');
+                            petalsRevealed++;
+                            createFallingPetals(3, '🌸');
+                            playHeartbeat();
+                            
+                            document.getElementById('petalCounter').textContent = `${petalsRevealed}/6`;
+                            
+                            if (petalsRevealed === petalMeanings.length) {
+                                document.getElementById('bloomInstruction').innerHTML = 'All truths revealed... <span style="opacity: 0.6;">transitioning</span>';
+                                setTimeout(() => {
+                                    nextStage(3);
+                                }, 2000);
+                            }
+                        }
+                    });
+                }, i * 300);
+            });
+
+            setupHoverStates();
+        }
+
+        // Answer selection
+        function selectAnswer(btn, stage, choice) {
+            btn.parentElement.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            userChoices['stage' + stage] = choice;
+            
+            playHeartbeat();
+            createFallingPetals(8, '🌸');
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            setTimeout(() => {
+                nextStage(stage + 1);
+            }, 1200);
+        }
+
+        // Color selection
+        let colorsSelected = 0;
+        let selectedColors = [];
+
+        function selectColor(element, emoji, color, meaning) {
+            if (selectedColors.includes(color)) return;
+            
+            selectedColors.push(color);
+            colorsSelected++;
+            
+            element.style.opacity = '0.5';
+            element.style.pointerEvents = 'none';
+            
+            playHeartbeat();
+            createFallingPetals(5, emoji);
+            if (navigator.vibrate) navigator.vibrate(30);
+            
+            document.getElementById('colorCounter').textContent = 
+                colorsSelected >= 3 ? 'Beautiful choices! ✨' : `Touch ${3 - colorsSelected} more roses`;
+            
+            if (colorsSelected >= 3) {
+                document.getElementById('colorContinue').classList.add('visible');
+            }
+        }
+
+        // Memory matching game
+        const memoryEmojis = ['🌹', '🌸', '🤍', '🌼', '🌺', '🥀'];
+        let memoryCards = [...memoryEmojis, ...memoryEmojis];
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            memoryCards = shuffleArray(memoryCards);
+            
+            memoryCards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <div class="front">🌹</div>
+                    <div class="back">${emoji}</div>
+                `;
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+
+            setupHoverStates();
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            playHeartbeat();
+
+            if (flippedCards.length === 2) {
+                setTimeout(checkMatch, 800);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.emoji === card2.dataset.emoji) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                createFallingPetals(10, card1.dataset.emoji);
+                if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+                
+                document.getElementById('memoryCounter').textContent = `Matches found: ${matchedPairs}/6`;
+                
+                if (matchedPairs === 6) {
+                    document.getElementById('memoryContinue').classList.add('visible');
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+            }
+            
+            flippedCards = [];
+        }
+
+        // Drag and drop garden
+        let gardenRoses = [];
+
+        function initDragDrop() {
+            const draggables = document.querySelectorAll('.draggable-rose');
+            const plot = document.getElementById('gardenPlot');
+
+            draggables.forEach(rose => {
+                rose.addEventListener('dragstart', (e) => {
+                    rose.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('text/plain', rose.textContent);
+                });
+
+                rose.addEventListener('dragend', () => {
+                    rose.classList.remove('dragging');
+                });
+            });
+
+            plot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                plot.style.borderColor = 'var(--soft-gold)';
+            });
+
+            plot.addEventListener('dragleave', () => {
+                plot.style.borderColor = 'var(--blush-pink)';
+            });
+
+            plot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const emoji = e.dataTransfer.getData('text/plain');
+                
+                const roseEl = document.createElement('div');
+                roseEl.className = 'draggable-rose';
+                roseEl.textContent = emoji;
+                roseEl.style.cursor = 'default';
+                
+                if (plot.querySelector('p')) {
+                    plot.innerHTML = '';
+                }
+                
+                plot.appendChild(roseEl);
+                plot.classList.add('has-roses');
+                gardenRoses.push(emoji);
+                
+                playHeartbeat();
+                createFallingPetals(5, emoji);
+                if (navigator.vibrate) navigator.vibrate(30);
+                
+                document.getElementById('gardenCounter').textContent = 
+                    gardenRoses.length >= 3 ? `Perfect! ${gardenRoses.length} roses planted 🌹` : `Add ${3 - gardenRoses.length} more roses`;
+                
+                if (gardenRoses.length >= 3) {
+                    document.getElementById('gardenContinue').classList.add('visible');
+                }
+                
+                plot.style.borderColor = 'var(--blush-pink)';
+            });
+
+            setupHoverStates();
+        }
+
+        // Rose number meanings
+        const numberMeanings = {
+            1: "One rose — Love at first sight or 'You are the one'",
+            3: "Three roses — 'I love you' (past, present, future)",
+            5: "Five roses — 'I admire you deeply'",
+            7: "Seven roses — 'I'm infatuated with you'",
+            12: "A dozen — 'Be mine' or 'Thank you'",
+            99: "Ninety-nine — 'I'll love you until the last rose dies' (eternal love)"
+        };
+
+        function selectRoseNumber(card, number) {
+            document.querySelectorAll('.rose-card').forEach(c => c.classList.remove('matched'));
+            card.classList.add('matched');
+            
+            document.getElementById('numberMeaning').textContent = numberMeanings[number];
+            playHeartbeat();
+            createFallingPetals(8, '🌹');
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        // Create final bouquet
+        function createFinalBouquet() {
+            const bouquet = document.getElementById('finalBouquet');
+            const roses = ['🌹', '🌹', '🌸', '🤍', '🌼', '🌺', '🥀', '🌹'];
+            
+            roses.forEach((rose, i) => {
+                const span = document.createElement('span');
+                span.textContent = rose;
+                span.style.animationDelay = (i * 0.2) + 's';
+                bouquet.appendChild(span);
+            });
+
+            // Massive petal celebration
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    createFallingPetals(3, roses[Math.floor(Math.random() * roses.length)]);
+                }, i * 100);
+            }
+        }
+
+        // Heartbeat sound
+        let audioContext;
+        function playHeartbeat() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 80;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            createParticles();
+            setupHoverStates();
+            
+            setTimeout(() => {
+                document.querySelector('.loading').classList.add('hidden');
+            }, 2000);
+
+            // Set up stage-specific initializations
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.target.classList.contains('active')) {
+                        const stageId = mutation.target.id;
+                        
+                        if (stageId === 'stage5') {
+                            initMemoryGame();
+                        } else if (stageId === 'stage7') {
+                            initDragDrop();
+                        } else if (stageId === 'stage10') {
+                            createFinalBouquet();
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.stage').forEach(stage => {
+                observer.observe(stage, { attributes: true, attributeFilter: ['class'] });
+            });
+
+            // Continuous ambient petals
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    createFallingPetals(1, ['🌸', '🌹', '🤍'][Math.floor(Math.random() * 3)]);
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
