@@ -3,15 +3,13 @@
  * UTC-based validation with anti-manipulation detection
  */
 
-import { TIMELINE, ADMIN_CONFIG } from '../utils/constants.js';
+import { TIMELINE } from '../utils/constants.js';
 
 class TimeGatekeeper {
     constructor() {
         this.currentDate = null;
         this.activeDay = null;
         this.isManipulated = false;
-        this.adminMode = false;
-        this.adminUnlockedDays = new Set();
         this.onManipulationDetected = null;
         this.lastCheck = performance.now();
         this.visitedToday = false;
@@ -87,10 +85,7 @@ class TimeGatekeeper {
         const day = TIMELINE[dayIndex];
         if (!day) return 'locked';
 
-        // Admin override
-        if (this.adminUnlockedDays.has(dayIndex)) {
-            return 'active';
-        }
+
 
         const dayDate = new Date(day.date + 'T00:00:00Z');
         const currentDate = new Date(this.currentDate + 'T00:00:00Z');
@@ -167,26 +162,7 @@ class TimeGatekeeper {
         }
     }
 
-    /**
-     * Admin authentication
-     */
-    authenticateAdmin(password) {
-        if (password === ADMIN_CONFIG.passwordHash) {
-            this.adminMode = true;
-            console.log('[TimeGatekeeper] Admin mode activated');
-            return true;
-        }
-        return false;
-    }
 
-    /**
-     * Admin: Unlock specific day
-     */
-    adminUnlockDay(dayIndex) {
-        if (!this.adminMode) return false;
-        this.adminUnlockedDays.add(dayIndex);
-        return true;
-    }
 
     /**
      * Get time until midnight UTC

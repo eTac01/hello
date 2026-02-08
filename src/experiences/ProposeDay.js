@@ -1,8 +1,7 @@
 /**
  * ProposeDay — February 8th Experience
  * Theme: Confession
- * 
- * Drag drifting words to form a confession
+ * A simple romantic proposal experience
  */
 
 import * as THREE from 'three';
@@ -14,317 +13,246 @@ class ProposeDay extends BaseExperience {
     constructor(dayIndex, sceneManager, onComplete) {
         super(dayIndex, sceneManager, onComplete);
 
-        this.words = [];
-        this.wordData = ['I', 'have', 'always', 'loved', 'you'];
-        this.correctOrder = [0, 1, 2, 3, 4];
-        this.placedWords = [];
-        this.targetLine = null;
-
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
-        this.selectedWord = null;
+        // 3D Objects
+        this.heart = null;
+        this.particles = [];
     }
 
     getInstruction() {
-        return 'Arrange the words... speak from the heart';
+        return 'Click the heart to reveal the message...';
     }
 
     getCompletionMessage() {
-        return 'Some words wait a lifetime<br>to be spoken.';
+        return 'A moment of courage,<br>a lifetime of love.';
     }
 
+    /**
+     * Initialize Propose Day experience
+     */
     async init() {
-        this.createWords();
-        this.createTargetLine();
+        this.createFloatingHeart();
+        this.createRomanticParticles();
         this.setupInteraction();
 
         await super.init();
 
+        // Start update loop
         this.unsubscribeUpdate = this.sceneManager.onUpdate(this.update.bind(this));
     }
 
-    createWords() {
-        const loader = new THREE.FontLoader ? new THREE.FontLoader() : null;
+    /**
+     * Create floating heart
+     */
+    createFloatingHeart() {
+        // Create heart shape
+        const heartShape = new THREE.Shape();
+        const x = 0, y = 0;
+        heartShape.moveTo(x + 0.5, y + 0.5);
+        heartShape.bezierCurveTo(x + 0.5, y + 0.5, x + 0.4, y, x, y);
+        heartShape.bezierCurveTo(x - 0.6, y, x - 0.6, y + 0.7, x - 0.6, y + 0.7);
+        heartShape.bezierCurveTo(x - 0.6, y + 1.1, x - 0.3, y + 1.54, x + 0.5, y + 1.9);
+        heartShape.bezierCurveTo(x + 1.2, y + 1.54, x + 1.6, y + 1.1, x + 1.6, y + 0.7);
+        heartShape.bezierCurveTo(x + 1.6, y + 0.7, x + 1.6, y, x + 1.0, y);
+        heartShape.bezierCurveTo(x + 0.7, y, x + 0.5, y + 0.5, x + 0.5, y + 0.5);
 
-        // Fallback: Use simple plane meshes with texture
-        this.wordData.forEach((word, index) => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 256;
-            canvas.height = 128;
+        const extrudeSettings = {
+            depth: 0.3,
+            bevelEnabled: true,
+            bevelSegments: 3,
+            steps: 2,
+            bevelSize: 0.05,
+            bevelThickness: 0.05
+        };
 
-            ctx.fillStyle = 'transparent';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+        geometry.center();
 
-            ctx.font = 'italic 48px Cormorant Garamond, serif';
-            ctx.fillStyle = '#f1c27d';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(word, canvas.width / 2, canvas.height / 2);
-
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.needsUpdate = true;
-
-            const material = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-                side: THREE.DoubleSide,
-                depthWrite: false
-            });
-
-            const geometry = new THREE.PlaneGeometry(1.5, 0.75);
-            const mesh = new THREE.Mesh(geometry, material);
-
-            // Random starting positions
-            mesh.position.set(
-                (Math.random() - 0.5) * 6,
-                (Math.random() - 0.5) * 4,
-                (Math.random() - 0.5) * 2
-            );
-
-            mesh.userData = {
-                index: index,
-                word: word,
-                floatOffset: Math.random() * Math.PI * 2,
-                isPlaced: false,
-                originalPos: mesh.position.clone()
-            };
-
-            this.words.push(mesh);
-            this.group.add(mesh);
+        const material = new THREE.MeshStandardMaterial({
+            color: COLORS_HEX.roseRed,
+            metalness: 0.3,
+            roughness: 0.4,
+            emissive: COLORS_HEX.roseRed,
+            emissiveIntensity: 0.5
         });
-    }
 
-    createTargetLine() {
-        // Create slots for words
-        const slotGeo = new THREE.PlaneGeometry(1.4, 0.1);
-        const slotMat = new THREE.MeshBasicMaterial({
-            color: COLORS_HEX.champagneGold,
+        this.heart = new THREE.Mesh(geometry, material);
+        this.heart.position.set(0, 0, 0);
+        this.heart.userData.clickable = true;
+        this.group.add(this.heart);
+
+        // Add glow
+        const glowGeometry = geometry.clone();
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS_HEX.roseRed,
             transparent: true,
-            opacity: 0.2
+            opacity: 0.3,
+            blending: THREE.AdditiveBlending
+        });
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        glow.scale.multiplyScalar(1.1);
+        this.heart.add(glow);
+    }
+
+    /**
+     * Create romantic particles
+     */
+    createRomanticParticles() {
+        const particleCount = 50;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 10;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const material = new THREE.PointsMaterial({
+            color: COLORS_HEX.champagneGold,
+            size: 0.05,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
         });
 
-        this.slots = [];
-        const startX = -3;
-
-        for (let i = 0; i < 5; i++) {
-            const slot = new THREE.Mesh(slotGeo, slotMat.clone());
-            slot.position.set(startX + i * 1.5, -2, 0);
-            slot.userData = { slotIndex: i, occupied: false };
-            this.slots.push(slot);
-            this.group.add(slot);
-        }
+        const particles = new THREE.Points(geometry, material);
+        this.group.add(particles);
+        this.particles.push(particles);
     }
 
+    /**
+     * Setup interaction
+     */
     setupInteraction() {
-        this.boundMouseMove = this.onPointerMove.bind(this);
-        this.boundMouseDown = this.onPointerDown.bind(this);
-        this.boundMouseUp = this.onPointerUp.bind(this);
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
 
-        // Mouse events
-        window.addEventListener('mousemove', this.boundMouseMove);
-        window.addEventListener('mousedown', this.boundMouseDown);
-        window.addEventListener('mouseup', this.boundMouseUp);
-
-        // Touch events for mobile drag
-        window.addEventListener('touchmove', this.boundMouseMove, { passive: false });
-        window.addEventListener('touchstart', this.boundMouseDown, { passive: false });
-        window.addEventListener('touchend', this.boundMouseUp, { passive: false });
+        window.addEventListener('click', this.onHeartClick.bind(this));
     }
 
-    onPointerMove(event) {
-        // Prevent default for touch
-        if (event.type === 'touchmove') {
-            event.preventDefault();
-        }
+    /**
+     * Handle heart click
+     */
+    onHeartClick(event) {
+        if (!this.isActive || this.isCompleted) return;
 
-        // Get position from mouse or touch
-        const clientX = event.clientX || (event.touches && event.touches[0] && event.touches[0].clientX);
-        const clientY = event.clientY || (event.touches && event.touches[0] && event.touches[0].clientY);
-
-        if (clientX === undefined || clientY === undefined) return;
-
-        this.mouse.x = (clientX / window.innerWidth) * 2 - 1;
-        this.mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
-        if (this.selectedWord) {
-            const vector = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
-            vector.unproject(this.sceneManager.camera);
-            const dir = vector.sub(this.sceneManager.camera.position).normalize();
-            const distance = -this.sceneManager.camera.position.z / dir.z;
-            const pos = this.sceneManager.camera.position.clone().add(dir.multiplyScalar(distance));
-
-            gsap.to(this.selectedWord.position, {
-                x: pos.x,
-                y: pos.y,
-                duration: 0.1
-            });
-        }
-    }
-
-    onPointerDown(event) {
-        if (this.phase !== 'interactive') return;
-
-        // Prevent default for touch
-        if (event.type === 'touchstart') {
-            event.preventDefault();
-        }
+        this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
         this.raycaster.setFromCamera(this.mouse, this.sceneManager.camera);
-        const intersects = this.raycaster.intersectObjects(this.words);
+        const intersects = this.raycaster.intersectObject(this.heart);
 
-        if (intersects.length > 0 && !intersects[0].object.userData.isPlaced) {
-            this.selectedWord = intersects[0].object;
-            gsap.to(this.selectedWord.scale, { x: 1.2, y: 1.2, duration: 0.2 });
+        if (intersects.length > 0) {
+            this.showProposal();
         }
     }
 
-    onPointerUp(event) {
-        // Prevent default for touch
-        if (event && event.type === 'touchend') {
-            event.preventDefault();
-        }
-        if (!this.selectedWord) return;
+    /**
+     * Show proposal message
+     */
+    showProposal() {
+        const overlay = document.createElement('div');
+        overlay.className = 'proposal-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 12, 24, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s;
+        `;
 
-        // Find nearest slot
-        let nearestSlot = null;
-        let minDist = Infinity;
+        overlay.innerHTML = `
+            <div style="
+                text-align: center;
+                color: #ffffff;
+                font-family: 'Patrick Hand', cursive;
+                max-width: 600px;
+                padding: 40px;
+            ">
+                <h1 style="
+                    font-size: 3rem;
+                    color: ${COLORS_HEX.roseRed};
+                    margin-bottom: 30px;
+                    text-shadow: 0 0 20px ${COLORS_HEX.roseRed};
+                ">Will You Be Mine?</h1>
+                <p style="
+                    font-size: 1.5rem;
+                    line-height: 1.8;
+                    margin-bottom: 40px;
+                ">
+                    In this moment, I ask you to share this journey with me.
+                    Every day with you is a gift, and I want to cherish them all.
+                </p>
+                <button id="accept-btn" style="
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 1.3rem;
+                    padding: 15px 50px;
+                    background: linear-gradient(135deg, #ff00ff, #ff69b4);
+                    border: 2px solid #ffffff;
+                    border-radius: 50px;
+                    color: #ffffff;
+                    cursor: pointer;
+                    box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+                    transition: all 0.3s;
+                ">Accept ❤️</button>
+            </div>
+        `;
 
-        this.slots.forEach(slot => {
-            if (!slot.userData.occupied) {
-                const dist = this.selectedWord.position.distanceTo(slot.position);
-                if (dist < minDist && dist < 1.5) {
-                    minDist = dist;
-                    nearestSlot = slot;
-                }
-            }
-        });
+        document.body.appendChild(overlay);
 
-        if (nearestSlot) {
-            this.placeWord(this.selectedWord, nearestSlot);
-        } else {
-            gsap.to(this.selectedWord.scale, { x: 1, y: 1, duration: 0.2 });
-        }
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+        }, 50);
 
-        this.selectedWord = null;
-    }
-
-    placeWord(word, slot) {
-        word.userData.isPlaced = true;
-        slot.userData.occupied = true;
-        slot.userData.wordIndex = word.userData.index;
-
-        this.placedWords[slot.userData.slotIndex] = word.userData.index;
-
-        gsap.to(word.position, {
-            x: slot.position.x,
-            y: slot.position.y + 0.3,
-            z: 0,
-            duration: 0.5,
-            ease: 'power3.out'
-        });
-
-        gsap.to(word.scale, { x: 1, y: 1, duration: 0.3 });
-        gsap.to(slot.material, { opacity: 0.5, duration: 0.3 });
-
-        // Check if all placed
-        const placedCount = this.words.filter(w => w.userData.isPlaced).length;
-        if (placedCount >= 5) {
-            this.checkSentence();
-        }
-    }
-
-    checkSentence() {
-        // Check if in correct order
-        const isCorrect = this.placedWords.every((wordIndex, slotIndex) => {
-            return wordIndex === this.correctOrder[slotIndex];
-        });
-
-        if (isCorrect) {
-            this.onConfessionComplete();
-        } else {
-            // Reset for retry
-            this.resetWords();
-        }
-    }
-
-    resetWords() {
-        this.words.forEach(word => {
-            word.userData.isPlaced = false;
-            gsap.to(word.position, {
-                x: word.userData.originalPos.x,
-                y: word.userData.originalPos.y,
-                z: word.userData.originalPos.z,
-                duration: 0.8
-            });
-        });
-
-        this.slots.forEach(slot => {
-            slot.userData.occupied = false;
-            gsap.to(slot.material, { opacity: 0.2, duration: 0.3 });
-        });
-
-        this.placedWords = [];
-    }
-
-    async onConfessionComplete() {
-        // Pulse effect
-        this.words.forEach((word, i) => {
-            gsap.to(word.material, {
+        overlay.querySelector('#accept-btn').addEventListener('click', () => {
+            gsap.to(overlay, {
                 opacity: 0,
                 duration: 1,
-                delay: i * 0.2
+                onComplete: () => {
+                    overlay.remove();
+                    this.complete();
+                }
             });
-        });
-
-        // Show acceptance pulse
-        const pulse = new THREE.Mesh(
-            new THREE.SphereGeometry(0.1, 32, 32),
-            new THREE.MeshBasicMaterial({
-                color: COLORS_HEX.roseRed,
-                transparent: true,
-                opacity: 0.8
-            })
-        );
-        pulse.position.set(0, -1.5, 0);
-        this.group.add(pulse);
-
-        gsap.to(pulse.scale, {
-            x: 20,
-            y: 20,
-            z: 20,
-            duration: 2,
-            ease: 'power2.out'
-        });
-
-        gsap.to(pulse.material, {
-            opacity: 0,
-            duration: 2,
-            onComplete: () => this.complete()
         });
     }
 
+    /**
+     * Update loop
+     */
     update(delta, elapsed) {
         if (!this.isActive) return;
 
-        this.words.forEach(word => {
-            if (!word.userData.isPlaced && word !== this.selectedWord) {
-                const offset = word.userData.floatOffset;
-                word.position.y = word.userData.originalPos.y + Math.sin(elapsed + offset) * 0.3;
-                word.rotation.z = Math.sin(elapsed * 0.5 + offset) * 0.1;
-            }
+        // Rotate heart
+        if (this.heart) {
+            this.heart.rotation.y += delta * 0.5;
+            this.heart.position.y = Math.sin(elapsed * 2) * 0.1;
+        }
+
+        // Animate particles
+        this.particles.forEach(p => {
+            p.rotation.y += delta * 0.1;
         });
     }
 
+    /**
+     * Dispose resources
+     */
     dispose() {
-        if (this.unsubscribeUpdate) this.unsubscribeUpdate();
-        window.removeEventListener('mousemove', this.boundMouseMove);
-        window.removeEventListener('mousedown', this.boundMouseDown);
-        window.removeEventListener('mouseup', this.boundMouseUp);
+        window.removeEventListener('click', this.onHeartClick.bind(this));
 
-        window.removeEventListener('touchmove', this.boundMouseMove);
-        window.removeEventListener('touchstart', this.boundMouseDown);
-        window.removeEventListener('touchend', this.boundMouseUp);
+        if (this.unsubscribeUpdate) {
+            this.unsubscribeUpdate();
+        }
+
         super.dispose();
     }
 }

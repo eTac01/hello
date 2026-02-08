@@ -35,57 +35,73 @@ export const TIMELINE = [
         date: '2026-02-07',
         day: 'Rose Day',
         theme: 'Admiration',
+        emoji: '🌹',
         index: 0,
-        experience: 'RoseDay'
+        experience: 'RoseDay',
+        url: '/rose-day.html'
     },
     {
         date: '2026-02-08',
         day: 'Propose Day',
         theme: 'Confession',
+        emoji: '💍',
         index: 1,
-        experience: 'ProposeDay'
+        experience: 'ProposeDay',
+        url: '/propose-day.html'
     },
     {
         date: '2026-02-09',
         day: 'Chocolate Day',
         theme: 'Sweetness',
+        emoji: '🍫',
         index: 2,
-        experience: 'ChocolateDay'
+        experience: 'ChocolateDay',
+        url: '/chocolate-day.html'
     },
     {
         date: '2026-02-10',
         day: 'Teddy Day',
         theme: 'Comfort',
+        emoji: '🧸',
         index: 3,
-        experience: 'TeddyDay'
+        experience: 'TeddyDay',
+        url: '/teddy-day.html'
     },
     {
         date: '2026-02-11',
         day: 'Promise Day',
         theme: 'Trust',
+        emoji: '🤝',
         index: 4,
-        experience: 'PromiseDay'
+        experience: 'PromiseDay',
+        url: '/promise-day.html'
     },
     {
         date: '2026-02-12',
         day: 'Hug Day',
         theme: 'Warmth',
+        emoji: '🤗',
         index: 5,
-        experience: 'HugDay'
+        experience: 'HugDay',
+        url: '/hug-day.html'
     },
     {
         date: '2026-02-13',
         day: 'Kiss Day',
         theme: 'Intimacy',
+        emoji: '💋',
         index: 6,
-        experience: 'KissDay'
+        experience: 'KissDay',
+        url: '/kiss-day.html'
     },
     {
         date: '2026-02-14',
-        day: 'Valentine\'s Day',
+        day: "Valentine's Day",
         theme: 'Union',
+        emoji: '❤️',
         index: 7,
-        experience: 'ValentineDay'
+        experience: 'ValentineDay',
+        url: '/valentine-day.html'
     }
 ];
 
@@ -130,11 +146,4 @@ export const QUALITY_TIERS = {
         antialias: false,
         postProcessing: false
     }
-};
-
-// Admin override (hashed password check)
-export const ADMIN_CONFIG = {
-    enabled: true,
-    // Simple obfuscation - in production, use proper auth
-    passwordHash: 'valentine2026admin'
 };

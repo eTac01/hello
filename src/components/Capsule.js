@@ -32,13 +32,13 @@ class Capsule {
 
         // Create material based on state (will be updated)
         this.material = new THREE.MeshStandardMaterial({
-            color: COLORS_HEX.champagneGold, // Neon Cyan
+            color: COLORS_HEX.champagneGold,
             metalness: 0.9,
             roughness: 0.1,
             emissive: COLORS_HEX.champagneGold,
             emissiveIntensity: 0.2,
             transparent: true,
-            opacity: 0.9
+            opacity: 0 // Make invisible - only emojis will be visible
         });
 
         this.mesh = new THREE.Mesh(geometry, this.material);
@@ -53,6 +53,12 @@ class Capsule {
 
         // Add inner particles
         this.createInnerParticles();
+
+        // Add emoji label
+        this.createEmojiLabel();
+
+        // Add "Let's Go" button
+        this.createButton();
 
         // Create group
         this.group = new THREE.Group();
@@ -71,7 +77,7 @@ class Capsule {
         const glowMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 uColor: { value: new THREE.Color(COLORS_HEX.roseRed) },
-                uIntensity: { value: 0.5 },
+                uIntensity: { value: 0 }, // Set to 0 to hide glow
                 uTime: { value: 0 }
             },
             vertexShader: `
@@ -133,12 +139,183 @@ class Capsule {
             color: COLORS_HEX.champagneGold,
             size: 0.02,
             transparent: true,
-            opacity: 0.6,
+            opacity: 0, // Hide particles
             blending: THREE.AdditiveBlending,
             depthWrite: false
         });
 
         this.particles = new THREE.Points(geometry, material);
+    }
+
+    createEmojiLabel() {
+        // Create HTML element for emoji
+        const emojiDiv = document.createElement('div');
+        emojiDiv.className = 'capsule-emoji';
+        emojiDiv.textContent = this.dayData.emoji;
+        emojiDiv.style.cssText = `
+            font-size: 4rem;
+            user-select: none;
+            pointer-events: auto;
+            cursor: pointer;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8);
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.9));
+            z-index: 10;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        `;
+
+        // Add hover effect
+        emojiDiv.addEventListener('mouseenter', () => {
+            emojiDiv.style.transform = 'translate(-50%, -50%) scale(1.2)';
+            emojiDiv.style.filter = 'drop-shadow(0 0 25px rgba(255, 0, 255, 0.9))';
+        });
+
+        emojiDiv.addEventListener('mouseleave', () => {
+            emojiDiv.style.transform = 'translate(-50%, -50%) scale(1)';
+            emojiDiv.style.filter = 'drop-shadow(0 0 15px rgba(0, 0, 0, 0.9))';
+        });
+
+        // Add click handler
+        emojiDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log('Emoji clicked for day:', this.dayIndex, this.dayData.day);
+
+            // Navigate to the URL for this day
+            const url = this.dayData.url;
+            if (url) {
+                console.log('Navigating to:', url);
+                window.location.href = url;
+            } else {
+                console.warn('No URL defined for:', this.dayData.day);
+            }
+        });
+
+        // Position it above the capsule using CSS positioning
+        this.emojiElement = emojiDiv;
+        document.getElementById('ui-overlay').appendChild(this.emojiElement);
+
+        console.log('Emoji created for day:', this.dayIndex, this.dayData.day);
+    }
+
+    /**
+     * Update emoji label position to follow capsule in 3D space
+     */
+    updateEmojiPosition(camera) {
+        if (!this.emojiElement) return;
+
+        // Get 3D position at capsule center (not above)
+        const labelPos = new THREE.Vector3(
+            this.mesh.position.x,
+            this.mesh.position.y,
+            this.mesh.position.z
+        );
+
+        // Project to screen space
+        labelPos.project(camera);
+
+        // Convert to pixel coordinates
+        const x = (labelPos.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (labelPos.y * -0.5 + 0.5) * window.innerHeight;
+
+        // Update position
+        this.emojiElement.style.position = 'fixed';
+        this.emojiElement.style.left = `${x}px`;
+        this.emojiElement.style.top = `${y}px`;
+        this.emojiElement.style.transform = 'translate(-50%, -50%)';
+
+        // Hide if behind camera
+        this.emojiElement.style.opacity = labelPos.z < 1 ? '1' : '0';
+    }
+
+    /**
+     * Create "Let's Go" button below capsule
+     */
+    createButton() {
+        // Create HTML button element
+        const buttonDiv = document.createElement('button');
+        buttonDiv.className = 'capsule-button';
+        buttonDiv.innerHTML = "Let's Go";
+        buttonDiv.style.cssText = `
+            position: fixed;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            color: #00ffff;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            display: none;
+        `;
+
+        // Add hover effect
+        buttonDiv.addEventListener('mouseenter', () => {
+            buttonDiv.style.background = 'linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(0, 255, 255, 0.3))';
+            buttonDiv.style.borderColor = '#ff00ff';
+            buttonDiv.style.color = '#ff00ff';
+            buttonDiv.style.transform = 'translateX(-50%) scale(1.1)';
+            buttonDiv.style.boxShadow = '0 0 25px rgba(255, 0, 255, 0.6)';
+        });
+
+        buttonDiv.addEventListener('mouseleave', () => {
+            buttonDiv.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2))';
+            buttonDiv.style.borderColor = '#00ffff';
+            buttonDiv.style.color = '#00ffff';
+            buttonDiv.style.transform = 'translateX(-50%) scale(1)';
+            buttonDiv.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)';
+        });
+
+        // Add click handler
+        buttonDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log('Button clicked for day:', this.dayIndex);
+            // Call global function to enter experience
+            if (window.enterCapsuleExperience) {
+                window.enterCapsuleExperience(this.dayIndex);
+            }
+        });
+
+        this.buttonElement = buttonDiv;
+        document.getElementById('ui-overlay').appendChild(this.buttonElement);
+
+        console.log('Button created for day:', this.dayIndex, this.dayData.day);
+    }
+
+    /**
+     * Update button position to follow capsule in 3D space
+     */
+    updateButtonPosition(camera) {
+        if (!this.buttonElement) return;
+
+        // Get 3D position below capsule
+        const buttonPos = new THREE.Vector3(
+            this.mesh.position.x,
+            this.mesh.position.y - 0.8,
+            this.mesh.position.z
+        );
+
+        // Project to screen space
+        buttonPos.project(camera);
+
+        // Convert to pixel coordinates
+        const x = (buttonPos.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (buttonPos.y * -0.5 + 0.5) * window.innerHeight;
+
+        // Update position
+        this.buttonElement.style.left = `${x}px`;
+        this.buttonElement.style.top = `${y}px`;
+        this.buttonElement.style.transform = 'translateX(-50%)';
+
+        // Show/hide based on state and camera position
+        const isVisible = buttonPos.z < 1 && this.state === 'active';
+        this.buttonElement.style.opacity = isVisible ? '1' : '0';
+        this.buttonElement.style.pointerEvents = isVisible ? 'auto' : 'none';
     }
 
     /**
@@ -323,6 +500,12 @@ class Capsule {
      * Update animation (called each frame)
      */
     update(delta, elapsed) {
+        // Update emoji label position
+        this.updateEmojiPosition(this.sceneManager.camera);
+
+        // Update button position
+        this.updateButtonPosition(this.sceneManager.camera);
+
         // Update glow time uniform
         if (this.glowMesh && this.glowMesh.material.uniforms) {
             this.glowMesh.material.uniforms.uTime.value = elapsed;
@@ -365,6 +548,16 @@ class Capsule {
      * Dispose resources
      */
     dispose() {
+        // Remove emoji label
+        if (this.emojiElement && this.emojiElement.parentNode) {
+            this.emojiElement.parentNode.removeChild(this.emojiElement);
+        }
+
+        // Remove button
+        if (this.buttonElement && this.buttonElement.parentNode) {
+            this.buttonElement.parentNode.removeChild(this.buttonElement);
+        }
+
         this.mesh.geometry.dispose();
         this.material.dispose();
         this.glowMesh.geometry.dispose();

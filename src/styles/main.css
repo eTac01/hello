@@ -251,6 +251,30 @@ h6 {
     }
 }
 
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-10px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(10px);
+    }
+}
+
+
 /* Exit Button */
 .exit-button {
     position: fixed;
@@ -375,39 +399,7 @@ h6 {
     line-height: 1.8;
 }
 
-/* Admin Panel */
-.admin-panel {
-    position: fixed;
-    bottom: var(--space-md);
-    right: var(--space-md);
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity var(--transition-fast);
-}
 
-.admin-panel.visible {
-    opacity: 1;
-}
-
-.admin-input {
-    background: rgba(11, 11, 15, 0.9);
-    border: 1px solid var(--champagne-gold-30);
-    color: var(--champagne-gold);
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    padding: var(--space-xs) var(--space-sm);
-    width: 200px;
-    outline: none;
-    transition: border-color var(--transition-fast);
-}
-
-.admin-input:focus {
-    border-color: var(--rose-red);
-}
-
-.admin-input::placeholder {
-    color: var(--champagne-gold-30);
-}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -519,18 +511,7 @@ h6 {
         padding: 0 var(--space-md);
     }
 
-    .admin-panel {
-        bottom: var(--space-sm);
-        right: var(--space-sm);
-    }
 
-    .admin-input {
-        font-size: 0.875rem;
-        padding: 0.6rem var(--space-sm);
-        width: 180px;
-        /* Ensure minimum tap target */
-        min-height: 44px;
-    }
 }
 
 /* Tablet Breakpoint */
