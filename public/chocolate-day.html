@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍫 Chocolate Day – The Sweetest Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cocoa-dark: #3d2817;
+            --cocoa-medium: #5c3d2e;
+            --cocoa-light: #8b6f47;
+            --caramel: #c9a66b;
+            --cream: #f4e4c1;
+            --chocolate: #4a2511;
+            --milk-chocolate: #7b4b2a;
+            --white-chocolate: #f3e5d4;
+            --love: #ff6b9d;
+            --glow: #ffd700;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, var(--cocoa-dark) 0%, var(--cocoa-medium) 50%, var(--chocolate) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--cream);
+            position: relative;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="20" font-size="20">🍫</text></svg>') 12 12, auto;
+        }
+
+        /* Particle System */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            90% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-20vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Game Container */
+        .game-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .level {
+            display: none;
+            opacity: 0;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .level.active {
+            display: block;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Chocolate 3D Display */
+        .chocolate-display {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 40px;
+            perspective: 1000px;
+        }
+
+        .chocolate-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate3d 8s ease-in-out infinite;
+        }
+
+        @keyframes rotate3d {
+
+            0%,
+            100% {
+                transform: rotateY(0deg) rotateX(10deg);
+            }
+
+            50% {
+                transform: rotateY(360deg) rotateX(-10deg);
+            }
+        }
+
+        .chocolate-piece {
+            width: 200px;
+            height: 240px;
+            background: linear-gradient(135deg, #3d2010 0%, #6b4423 50%, #8b5a3c 100%);
+            border-radius: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                inset 0 -2px 20px rgba(255, 255, 255, 0.1),
+                inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .chocolate-piece::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+
+            0%,
+            100% {
+                transform: translateX(-100%) translateY(-100%);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%);
+            }
+        }
+
+        .chocolate-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 15px;
+            height: 100%;
+        }
+
+        .chocolate-square {
+            background: linear-gradient(135deg, rgba(107, 68, 35, 0.8) 0%, rgba(61, 32, 16, 0.9) 100%);
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .chocolate-square:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(0.95);
+            }
+        }
+
+        .melt-drop {
+            position: absolute;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(180deg, #6b4423 0%, #3d2010 100%);
+            border-radius: 0 0 50% 50%;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: drip 4s ease-in-out infinite;
+        }
+
+        @keyframes drip {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(-50%) translateY(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Typography */
+        .level-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--caramel) 50%, var(--glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+            line-height: 1.2;
+        }
+
+        .level-text {
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            margin-bottom: 40px;
+            color: var(--cream);
+            font-weight: 400;
+            line-height: 1.6;
+            animation: typewriter 0.8s steps(40) forwards;
+        }
+
+        .emoji-float {
+            display: inline-block;
+            font-size: 1.5em;
+            animation: emojiFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes emojiFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .game-button {
+            padding: 18px 40px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .game-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .game-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-button:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--love) 0%, #ff8fab 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--caramel) 0%, var(--cocoa-light) 100%);
+            color: var(--cream);
+        }
+
+        .btn-emoji {
+            width: 80px;
+            height: 80px;
+            padding: 0;
+            font-size: 2.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-emoji:hover {
+            animation: wobble 0.5s ease-in-out;
+        }
+
+        @keyframes wobble {
+
+            0%,
+            100% {
+                transform: translateY(-5px) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-5px) rotate(-10deg);
+            }
+
+            75% {
+                transform: translateY(-5px) rotate(10deg);
+            }
+        }
+
+        /* Chocolate Cards */
+        .chocolate-cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .chocolate-card {
+            width: 150px;
+            height: 200px;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .chocolate-card:hover {
+            transform: translateY(-15px) rotateY(10deg);
+        }
+
+        .card-dark {
+            background: linear-gradient(135deg, #2d1810 0%, #4a2511 100%);
+        }
+
+        .card-milk {
+            background: linear-gradient(135deg, #7b4b2a 0%, #a67c52 100%);
+        }
+
+        .card-white {
+            background: linear-gradient(135deg, #f3e5d4 0%, #ffffff 100%);
+        }
+
+        .card-emoji {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+        }
+
+        .card-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--cream);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-white .card-label {
+            color: var(--chocolate);
+        }
+
+        /* Melting Chocolate Animation */
+        .melting-chocolate {
+            width: 150px;
+            height: 150px;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        .chocolate-blob {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6b4423 0%, #3d2010 100%);
+            border-radius: 50% 50% 40% 40%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            animation: melt 4s ease-in-out infinite;
+        }
+
+        @keyframes melt {
+
+            0%,
+            100% {
+                border-radius: 50% 50% 40% 40%;
+                transform: scale(1);
+            }
+
+            50% {
+                border-radius: 40% 40% 50% 50%;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Screen Shake */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-10px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            font-size: 30px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Heart Explosion */
+        .heart-explosion {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .heart-particle {
+            position: absolute;
+            font-size: 40px;
+            animation: heartExplode 2s ease-out forwards;
+        }
+
+        @keyframes heartExplode {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Zoom Effect */
+        .zoom-in {
+            animation: zoomIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .chocolate-display {
+                width: 250px;
+                height: 250px;
+            }
+
+            .chocolate-piece {
+                width: 160px;
+                height: 200px;
+            }
+
+            .chocolate-cards {
+                gap: 15px;
+            }
+
+            .chocolate-card {
+                width: 120px;
+                height: 160px;
+            }
+
+            .card-emoji {
+                font-size: 3rem;
+            }
+
+            .game-button {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+
+            .btn-emoji {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            animation: loading 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Particle System -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Game Container -->
+    <div class="game-container">
+        <!-- LEVEL 1: Chocolate Temptation -->
+        <div class="level active" id="level1">
+            <div class="chocolate-display">
+                <img src="./emoji/chocoletday.webp" alt="Chocolate Day"
+                    style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
+            </div>
+            <h1 class="level-title">Chocolate Day is incomplete without this...</h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.orderChocolate()">Order 🍫</button>
+                <button class="game-button btn-secondary" onclick="game.controlMyself()">No, I'm controlling myself
+                    😌</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 2: The Block -->
+        <div class="level" id="level2">
+            <h1 class="level-title">Sorry daddy won't allow <span class="emoji-float">🥲🍫</span></h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.askWhy()">Why? 🤨</button>
+                <button class="game-button btn-secondary" onclick="game.skipToGame()">Skip 😏</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3A: Why Path -->
+        <div class="level" id="level3a">
+            <h1 class="level-title">I want momma.</h1>
+            <p class="level-text"><span class="emoji-float">😅🍫</span></p>
+            <p class="level-text">Since you're still here... Let's play <span class="emoji-float">😏</span></p>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.startFlirtGame()">Let's Go! 🎮</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3.1: Choco Temptation Test -->
+        <div class="level" id="level3-1">
+            <h1 class="level-title">Pick one. Don't think.<br>Your choice says a lot.</h1>
+            <div class="chocolate-cards">
+                <div class="chocolate-card card-dark" onclick="game.chooseChocolate('dark')">
+                    <div class="card-emoji">🍫</div>
+                    <div class="card-label">Dark</div>
+                </div>
+                <div class="chocolate-card card-milk" onclick="game.chooseChocolate('milk')">
+                    <div class="card-emoji">🍫</div>
+                    <div class="card-label">Milk</div>
+                </div>
+                <div class="chocolate-card card-white" onclick="game.chooseChocolate('white')">
+                    <div class="card-emoji">🍫</div>
+                    <div class="card-label">White</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEVEL 3.1 Response -->
+        <div class="level" id="level3-1-response">
+            <h1 class="level-title" id="chocolateResponse"></h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.nextLevel('level3-2')">Next Challenge 😏</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3.2: Reaction Challenge -->
+        <div class="level" id="level3-2">
+            <h1 class="level-title">Quick. This chocolate is melting...<br>What do you do?</h1>
+            <div class="melting-chocolate">
+                <div class="chocolate-blob"></div>
+            </div>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.chooseReaction('lick')">Lick it 😋</button>
+                <button class="game-button btn-primary" onclick="game.chooseReaction('share')">Share it 🤍</button>
+                <button class="game-button btn-secondary" onclick="game.chooseReaction('melt')">Let it melt 😈</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3.2 Response -->
+        <div class="level" id="level3-2-response">
+            <h1 class="level-title" id="reactionResponse"></h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.nextLevel('level3-3')">Final Question 🔥</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3.3: The Dangerous Question -->
+        <div class="level" id="level3-3">
+            <h1 class="level-title zoom-in">Be honest...<br>Chocolate or me?</h1>
+            <div class="button-group">
+                <button class="game-button btn-secondary" onclick="game.finalChoice('chocolate')">Chocolate 🍫</button>
+                <button class="game-button btn-primary" onclick="game.finalChoice('you')">You 😳</button>
+                <button class="game-button btn-primary" onclick="game.finalChoice('sharing')">Depends... are we sharing?
+                    😏</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3.3 Response -->
+        <div class="level" id="level3-3-response">
+            <h1 class="level-title" id="finalResponse"></h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.completeGame()">Complete Game 🎁</button>
+            </div>
+        </div>
+
+        <!-- LEVEL 3B: Skip Path Mini Game -->
+        <div class="level" id="level3b">
+            <h1 class="level-title">Skipping chocolate?<br>Let's test you then <span class="emoji-float">😈</span></h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.startMiniGame()">Bring it on! 🎮</button>
+            </div>
+        </div>
+
+        <!-- Mini Game Question 1 -->
+        <div class="level" id="minigame1">
+            <h1 class="level-title">Chocolate melts... but memories don't.</h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.miniAnswer(1, 'eat')">Eat it 🍫</button>
+                <button class="game-button btn-secondary" onclick="game.miniAnswer(1, 'save')">Save it for later
+                    💌</button>
+            </div>
+        </div>
+
+        <!-- Mini Game Question 2 -->
+        <div class="level" id="minigame2">
+            <h1 class="level-title">Late night craving hits.</h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.miniAnswer(2, 'movie')">Chocolate + movie
+                    🎬🍫</button>
+                <button class="game-button btn-primary" onclick="game.miniAnswer(2, 'you')">Chocolate + you 😌</button>
+            </div>
+        </div>
+
+        <!-- Mini Game Question 3 -->
+        <div class="level" id="minigame3">
+            <h1 class="level-title">Last piece left.</h1>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.miniAnswer(3, 'share')">Share 🤍</button>
+                <button class="game-button btn-secondary" onclick="game.miniAnswer(3, 'steal')">Steal 😈</button>
+            </div>
+        </div>
+
+        <!-- Mini Game Response -->
+        <div class="level" id="minigame-response">
+            <h1 class="level-title" id="miniResponse"></h1>
+        </div>
+
+        <!-- Completion Screen -->
+        <div class="level" id="completion">
+            <h1 class="level-title">Congratulations!<br>You survived Chocolate Day...<br>And somehow made it sweeter
+                <span class="emoji-float">🍫💖</span></h1>
+            <div class="button-group">
+                <button class="game-button btn-secondary" onclick="game.restart()">Restart Game 🔁</button>
+                <button class="game-button btn-primary" onclick="game.claimWish()">Claim Chocolate Day Wish 🍫✨</button>
+            </div>
+        </div>
+
+        <!-- Final Wish -->
+        <div class="level" id="final-wish">
+            <h1 class="level-title">Happy Chocolate Day! 🍫💖<br>If sweetness had a face,<br>it'd look like you.</h1>
+            <p class="level-text">You're sweeter than any chocolate anyway ❤️🍫</p>
+            <div class="button-group">
+                <button class="game-button btn-primary" onclick="game.restart()">Play Again 🔁</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Particle System
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            const particleEmojis = ['🍫', '🤎', '✨', '💝', '🍬'];
+
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                particles.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 7000);
+            }, 800);
+        }
+
+        // Confetti Effect
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            document.body.appendChild(confetti);
+
+            const confettiEmojis = ['🍫', '💖', '✨', '🤎', '💝', '🎉'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+                    piece.style.left = Math.random() * 100 + '%';
+                    piece.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.appendChild(piece);
+                }, i * 50);
+            }
+
+            setTimeout(() => confetti.remove(), 3500);
+        }
+
+        // Heart Explosion Effect
+        function createHeartExplosion() {
+            const explosion = document.createElement('div');
+            explosion.className = 'heart-explosion';
+            document.body.appendChild(explosion);
+
+            const hearts = ['🍫', '💖', '❤️', '🤎', '💝'];
+
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+
+                const angle = (i / 20) * Math.PI * 2;
+                const distance = 150 + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.setProperty('--ty', ty + 'px');
+                heart.style.animation = `heartExplode 2s ease-out forwards`;
+                heart.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+
+                explosion.appendChild(heart);
+            }
+
+            setTimeout(() => explosion.remove(), 2500);
+        }
+
+        // Vibration (Mobile)
+        function vibrate() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Game Logic
+        const game = {
+            currentLevel: 'level1',
+            miniGameProgress: 0,
+            miniAnswers: [],
+
+            changeLevel(levelId) {
+                document.querySelectorAll('.level').forEach(level => {
+                    level.classList.remove('active');
+                });
+
+                setTimeout(() => {
+                    const newLevel = document.getElementById(levelId);
+                    newLevel.classList.add('active');
+                    this.currentLevel = levelId;
+                }, 300);
+            },
+
+            orderChocolate() {
+                vibrate();
+                document.querySelector('.game-container').classList.add('shake');
+                setTimeout(() => {
+                    document.querySelector('.game-container').classList.remove('shake');
+                    this.changeLevel('level2');
+                }, 600);
+            },
+
+            controlMyself() {
+                vibrate();
+                this.changeLevel('level3b');
+            },
+
+            askWhy() {
+                vibrate();
+                this.changeLevel('level3a');
+            },
+
+            skipToGame() {
+                vibrate();
+                this.changeLevel('level3b');
+            },
+
+            startFlirtGame() {
+                vibrate();
+                this.changeLevel('level3-1');
+            },
+
+            chooseChocolate(type) {
+                vibrate();
+                const responses = {
+                    dark: "Bold choice. You pretend you're calm... but you know exactly what you want 😌🍫",
+                    milk: "Classic. Warm. Comforting. Basically... dangerous in the sweetest way 🥰",
+                    white: "Soft on the outside. Secretly the one who causes the most trouble 😏"
+                };
+
+                document.getElementById('chocolateResponse').textContent = responses[type];
+                this.changeLevel('level3-1-response');
+            },
+
+            chooseReaction(reaction) {
+                vibrate();
+                const responses = {
+                    lick: "Straight to the point, huh? I like your confidence 😌🍫",
+                    share: "Okay wow... That was unfairly cute 🫠",
+                    melt: "You enjoy chaos... I definitely need to watch you 😏🔥"
+                };
+
+                document.getElementById('reactionResponse').textContent = responses[reaction];
+                this.changeLevel('level3-2-response');
+            },
+
+            finalChoice(choice) {
+                vibrate();
+                const responses = {
+                    chocolate: "Liar. But I respect the honesty 😌",
+                    you: "Oh... That was smooth. Don't do that again... or do 😳❤️",
+                    sharing: "That answer should be illegal. Happy Chocolate Day, troublemaker 🍫✨"
+                };
+
+                document.getElementById('finalResponse').textContent = responses[choice];
+                this.changeLevel('level3-3-response');
+            },
+
+            completeGame() {
+                vibrate();
+                createHeartExplosion();
+                createConfetti();
+                this.changeLevel('completion');
+            },
+
+            startMiniGame() {
+                vibrate();
+                this.miniGameProgress = 0;
+                this.miniAnswers = [];
+                this.changeLevel('minigame1');
+            },
+
+            miniAnswer(question, answer) {
+                vibrate();
+                this.miniAnswers.push(answer);
+
+                const responses = {
+                    1: {
+                        eat: "Live in the moment vibes 🍫✨",
+                        save: "You're a planner... I see you 💌"
+                    },
+                    2: {
+                        movie: "Cozy choice 🎬🍫",
+                        you: "Okay that was bold 😌🔥"
+                    },
+                    3: {
+                        share: "Your heart is too pure 🤍",
+                        steal: "Chaotic energy. I'm into it 😈"
+                    }
+                };
+
+                if (question < 3) {
+                    // Show quick response
+                    const miniResponse = document.getElementById('miniResponse');
+                    miniResponse.textContent = responses[question][answer];
+                    this.changeLevel('minigame-response');
+
+                    setTimeout(() => {
+                        this.changeLevel(`minigame${question + 1}`);
+                    }, 1500);
+                } else {
+                    // Final response
+                    const miniResponse = document.getElementById('miniResponse');
+                    miniResponse.innerHTML = responses[question][answer] + '<br><br>Whatever you choose...<br>Chocolate Day is sweeter with you in it 🍫✨';
+                    this.changeLevel('minigame-response');
+
+                    setTimeout(() => {
+                        createConfetti();
+                        this.changeLevel('completion');
+                    }, 3000);
+                }
+            },
+
+            nextLevel(levelId) {
+                vibrate();
+                this.changeLevel(levelId);
+            },
+
+            claimWish() {
+                vibrate();
+                createHeartExplosion();
+                createConfetti();
+                setTimeout(() => {
+                    this.changeLevel('final-wish');
+                }, 500);
+            },
+
+            restart() {
+                vibrate();
+                location.reload();
+            }
+        };
+
+        // Initialize
+        createParticles();
+
+        // Add touch feedback for mobile
+        document.addEventListener('touchstart', function () {
+            // Adds haptic feedback on mobile devices
+        }, { passive: true });
+    </script>
+</body>
+
+</html>

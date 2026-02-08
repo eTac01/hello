@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Question Worth Asking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --wine-black: #1a0a0f;
+            --deep-rose: #8b2942;
+            --soft-pink: #d4849c;
+            --gold-accent: #d4af37;
+            --midnight-purple: #2d1b2e;
+            --petal-white: #fff5f7;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--wine-black);
+            color: var(--petal-white);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--soft-pink);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.2s ease, background 0.2s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor.hover {
+            transform: scale(1.5);
+            background: var(--soft-pink);
+        }
+
+        /* Animated Background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 20% 30%, rgba(139, 41, 66, 0.15), transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, rgba(45, 27, 46, 0.2), transparent 50%),
+                        linear-gradient(135deg, var(--wine-black) 0%, var(--midnight-purple) 100%);
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--soft-pink);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-particle 8s infinite;
+            filter: blur(1px);
+        }
+
+        @keyframes float-particle {
+            0%, 100% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-20vh) scale(1); }
+        }
+
+        .heartbeat-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(212, 132, 156, 0.1), transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
+        }
+
+        /* Main Container */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Stages */
+        .stage {
+            display: none;
+            opacity: 0;
+            animation: fadeInStage 1s forwards;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .stage.active {
+            display: block;
+        }
+
+        @keyframes fadeInStage {
+            to { opacity: 1; }
+        }
+
+        /* Typography */
+        .title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: var(--soft-pink);
+            opacity: 0;
+            animation: slideUp 0.8s ease forwards 0.3s;
+        }
+
+        .body-text {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: slideUp 0.8s ease forwards 0.6s;
+            font-weight: 300;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Letter-by-letter reveal */
+        .reveal-text {
+            display: inline-block;
+            opacity: 0;
+            animation: revealLetter 0.05s forwards;
+        }
+
+        @keyframes revealLetter {
+            to { opacity: 1; }
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 1.1rem;
+            border: 2px solid var(--soft-pink);
+            background: transparent;
+            color: var(--petal-white);
+            cursor: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--soft-pink);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+
+        .btn:hover {
+            color: var(--wine-black);
+            border-color: var(--soft-pink);
+            transform: translateY(-2px);
+        }
+
+        /* Puzzle Elements */
+        .puzzle-container {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(139, 41, 66, 0.1);
+            border: 1px solid rgba(212, 132, 156, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .heart-pieces {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .heart-piece {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--deep-rose), var(--soft-pink));
+            border-radius: 10px;
+            cursor: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            opacity: 0.6;
+            position: relative;
+        }
+
+        .heart-piece:hover {
+            opacity: 1;
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .heart-piece.found {
+            opacity: 1;
+            animation: foundPulse 0.5s ease;
+        }
+
+        @keyframes foundPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .hold-heart {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--deep-rose), var(--soft-pink));
+            border-radius: 50%;
+            margin: 2rem auto;
+            cursor: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+        }
+
+        .hold-heart::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border: 3px solid var(--soft-pink);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hold-heart.holding::after {
+            opacity: 1;
+            animation: pulseRing 1s ease infinite;
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(212, 132, 156, 0.2);
+            border-radius: 2px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--soft-pink), var(--gold-accent));
+            width: 0;
+            transition: width 0.5s ease;
+        }
+
+        /* Bouquet Animation */
+        .bouquet {
+            position: fixed;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .bouquet.show {
+            bottom: 50%;
+            transform: translate(-50%, 50%);
+        }
+
+        .flower {
+            font-size: 4rem;
+            display: inline-block;
+            animation: flowerBounce 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes flowerBounce {
+            0% { opacity: 0; transform: translateY(100px) scale(0) rotate(0deg); }
+            60% { transform: translateY(-20px) scale(1.1) rotate(10deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+        }
+
+        .petal {
+            position: fixed;
+            font-size: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        @keyframes petalFall {
+            0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(360deg); }
+        }
+
+        /* Floating Emojis */
+        .floating-emoji {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.3;
+            animation: floatEmoji 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes floatEmoji {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(10deg); opacity: 0.6; }
+        }
+
+        /* Final Proposal */
+        .proposal-box {
+            background: linear-gradient(135deg, rgba(139, 41, 66, 0.2), rgba(45, 27, 46, 0.2));
+            padding: 3rem 2rem;
+            border-radius: 30px;
+            border: 2px solid var(--gold-accent);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(20px);
+        }
+
+        .proposal-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .final-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .final-btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            border: 2px solid var(--gold-accent);
+            background: linear-gradient(135deg, var(--deep-rose), var(--soft-pink));
+            color: var(--petal-white);
+            cursor: none;
+            transition: all 0.4s ease;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .final-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Celebration */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .heart-explosion {
+            position: absolute;
+            font-size: 2rem;
+            animation: explodeHeart 2s ease-out forwards;
+        }
+
+        @keyframes explodeHeart {
+            0% { opacity: 1; transform: translate(0, 0) scale(0); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
+        }
+
+        /* GIF Container */
+        .gif-container {
+            margin: 2rem 0;
+            border-radius: 20px;
+            overflow: hidden;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            animation: slideUp 0.8s ease forwards 0.9s;
+        }
+
+        .gif-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cursor { display: none; }
+            body { cursor: auto; }
+            .btn, .final-btn, .heart-piece, .hold-heart { cursor: pointer; }
+            
+            .final-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--wine-black);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-heart {
+            font-size: 4rem;
+            animation: beatHeart 1s ease-in-out infinite;
+        }
+
+        @keyframes beatHeart {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading">
+        <div class="loading-heart">❤️</div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="background">
+        <div class="bg-gradient"></div>
+        <div class="heartbeat-glow"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Stage 1: Introduction -->
+        <div class="stage active" id="stage1">
+            <h1 class="title">Some questions<br>don't need answers.</h1>
+            <p class="subtitle">They just need courage.</p>
+            <p class="body-text">But before I ask mine... let me know you're really here.</p>
+            <div class="btn-group">
+                <button class="btn" onclick="nextStage(2)">I'm here 💫</button>
+                <button class="btn" onclick="teasingResponse()">I'm pretending to ignore you 😌</button>
+            </div>
+        </div>
+
+        <!-- Stage 2: Teasing Question -->
+        <div class="stage" id="stage2">
+            <h2 class="subtitle">Okay, real talk...</h2>
+            <p class="body-text">If I steal your hoodie, will you steal my heart?</p>
+            <div class="btn-group">
+                <button class="btn" onclick="nextStage(3)">That's the deal 😊</button>
+                <button class="btn" onclick="teasingResponse2()">You already did 😳</button>
+                <button class="btn" onclick="teasingResponse2()">Keep the hoodie, I'll take your hand ❤️</button>
+            </div>
+        </div>
+
+        <!-- Stage 3: Puzzle - Find Hidden Hearts -->
+        <div class="stage" id="stage3">
+            <h2 class="subtitle">Let's play a game...</h2>
+            <p class="body-text">Find the hearts I've hidden for you. Click each one to reveal it.</p>
+            <div class="puzzle-container">
+                <div class="heart-pieces" id="heartPieces">
+                    <div class="heart-piece" onclick="findHeart(this)">❓</div>
+                    <div class="heart-piece" onclick="findHeart(this)">❓</div>
+                    <div class="heart-piece" onclick="findHeart(this)">❓</div>
+                    <div class="heart-piece" onclick="findHeart(this)">❓</div>
+                    <div class="heart-piece" onclick="findHeart(this)">❓</div>
+                    <div class="heart-piece" onclick="findHeart(this)">❓</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 4: Hold the Heart -->
+        <div class="stage" id="stage4">
+            <h2 class="subtitle">Almost there...</h2>
+            <p class="body-text">Hold this heart for 5 seconds if you feel it beating.</p>
+            <div class="hold-heart" id="holdHeart" onmousedown="startHolding()" onmouseup="stopHolding()" ontouchstart="startHolding()" ontouchend="stopHolding()">
+                💗
+            </div>
+            <p class="body-text" id="holdTimer">0s</p>
+        </div>
+
+        <!-- Stage 5: Fate Question -->
+        <div class="stage" id="stage5">
+            <h2 class="subtitle">One more thing...</h2>
+            <p class="body-text">Do you believe in fate... or should I ask again?</p>
+            <div class="btn-group">
+                <button class="btn" onclick="nextStage(6)">I believe in us 💫</button>
+                <button class="btn" onclick="nextStage(6)">Ask me forever ❤️</button>
+                <button class="btn" onclick="nextStage(6)">Fate brought me here 🌹</button>
+            </div>
+        </div>
+
+        <!-- Stage 6: The Proposal -->
+        <div class="stage" id="stage6">
+            <div class="proposal-box">
+                <p class="proposal-text" id="proposalText"></p>
+                <div class="final-buttons">
+                    <button class="final-btn" onclick="celebrate('yes')">Yes 💍</button>
+                    <button class="final-btn" onclick="celebrate('already')">I already am ❤️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="stage" id="stage7">
+            <h1 class="title">You just made me<br>the happiest.</h1>
+            <div class="gif-container">
+                <img src="https://media.giphy.com/media/l0HlPwMAzh13pcZ20/giphy.gif" alt="Happy celebration">
+            </div>
+            <p class="body-text">Every day. Every moment. Every heartbeat. It's you.</p>
+        </div>
+    </div>
+
+    <!-- Bouquet (hidden initially) -->
+    <div class="bouquet" id="bouquet"></div>
+
+    <!-- Celebration Container -->
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        const interactiveElements = document.querySelectorAll('.btn, .final-btn, .heart-piece, .hold-heart');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Generate floating particles
+        function createParticles() {
+            const background = document.querySelector('.background');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+                background.appendChild(particle);
+            }
+        }
+
+        // Generate floating emojis
+        function createFloatingEmojis() {
+            const emojis = ['❤️', '🌹', '💫', '✨'];
+            const container = document.querySelector('.container');
+            
+            for (let i = 0; i < 8; i++) {
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-emoji';
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = Math.random() * 100 + '%';
+                emoji.style.top = Math.random() * 100 + '%';
+                emoji.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(emoji);
+            }
+        }
+
+        // Stage management
+        let currentStage = 1;
+
+        function nextStage(stageNum) {
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById('stage' + stageNum).classList.add('active');
+            currentStage = stageNum;
+
+            if (stageNum === 6) {
+                revealProposal();
+            }
+        }
+
+        // Teasing responses
+        function teasingResponse() {
+            const stage = document.getElementById('stage1');
+            const text = stage.querySelector('.body-text');
+            text.innerHTML = "Cute. But I see you smiling. 😊";
+            setTimeout(() => nextStage(2), 2000);
+        }
+
+        function teasingResponse2() {
+            const stage = document.getElementById('stage2');
+            const text = stage.querySelector('.body-text');
+            text.innerHTML = "You're making me blush... but let's keep going. 💗";
+            setTimeout(() => nextStage(3), 2000);
+        }
+
+        // Puzzle: Find Hearts
+        let heartsFound = 0;
+        const totalHearts = 6;
+
+        function findHeart(element) {
+            if (!element.classList.contains('found')) {
+                element.textContent = '❤️';
+                element.classList.add('found');
+                heartsFound++;
+                
+                const progress = (heartsFound / totalHearts) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+
+                if (heartsFound === totalHearts) {
+                    setTimeout(() => {
+                        showBouquetPreview();
+                        setTimeout(() => nextStage(4), 2000);
+                    }, 500);
+                }
+            }
+        }
+
+        function showBouquetPreview() {
+            createPetals(10);
+        }
+
+        // Hold the Heart Puzzle
+        let holdTimer = null;
+        let holdDuration = 0;
+
+        function startHolding() {
+            const heart = document.getElementById('holdHeart');
+            heart.classList.add('holding');
+            holdDuration = 0;
+            
+            holdTimer = setInterval(() => {
+                holdDuration++;
+                document.getElementById('holdTimer').textContent = holdDuration + 's';
+                
+                if (holdDuration >= 5) {
+                    stopHolding();
+                    setTimeout(() => nextStage(5), 1000);
+                }
+            }, 1000);
+        }
+
+        function stopHolding() {
+            const heart = document.getElementById('holdHeart');
+            heart.classList.remove('holding');
+            if (holdTimer) {
+                clearInterval(holdTimer);
+                holdTimer = null;
+            }
+        }
+
+        // Reveal proposal text letter by letter
+        function revealProposal() {
+            const text = "I don't promise perfection. I promise honesty, laughter, arguments we'll work through, growth that scares us both, and love that chooses you — every single day. Not because it's easy. Because it's you. So... will you be mine?";
+            const container = document.getElementById('proposalText');
+            container.innerHTML = '';
+            
+            // Show bouquet
+            const bouquet = document.getElementById('bouquet');
+            bouquet.innerHTML = '🌹🌹💐🌹🌹';
+            bouquet.querySelectorAll('.flower').forEach((f, i) => {
+                f.style.animationDelay = (i * 0.2) + 's';
+            });
+            
+            setTimeout(() => {
+                bouquet.classList.add('show');
+                createPetals(20);
+            }, 500);
+
+            // Letter by letter
+            let index = 0;
+            const revealInterval = setInterval(() => {
+                if (index < text.length) {
+                    const span = document.createElement('span');
+                    span.className = 'reveal-text';
+                    span.textContent = text[index];
+                    span.style.animationDelay = '0s';
+                    container.appendChild(span);
+                    index++;
+                } else {
+                    clearInterval(revealInterval);
+                }
+            }, 50);
+        }
+
+        // Create falling petals
+        function createPetals(count) {
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.textContent = '🌸';
+                petal.style.left = Math.random() * 100 + '%';
+                petal.style.top = '-50px';
+                petal.style.animationDuration = (3 + Math.random() * 3) + 's';
+                petal.style.animationDelay = (Math.random() * 2) + 's';
+                petal.style.animation = 'petalFall ' + (3 + Math.random() * 3) + 's linear forwards';
+                document.body.appendChild(petal);
+                
+                setTimeout(() => petal.remove(), 6000);
+            }
+        }
+
+        // Celebration
+        function celebrate(response) {
+            const celebration = document.getElementById('celebration');
+            
+            // Heart explosion
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-explosion';
+                heart.textContent = '❤️';
+                const angle = (Math.PI * 2 * i) / 30;
+                const distance = 200 + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                heart.style.left = '50%';
+                heart.style.top = '50%';
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.setProperty('--ty', ty + 'px');
+                heart.style.animationDelay = (Math.random() * 0.5) + 's';
+                celebration.appendChild(heart);
+            }
+
+            // More petals
+            createPetals(50);
+
+            // Vibrate if supported (mobile)
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+
+            setTimeout(() => {
+                nextStage(7);
+                celebration.innerHTML = '';
+            }, 2000);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            createParticles();
+            createFloatingEmojis();
+            
+            // Hide loading screen
+            setTimeout(() => {
+                document.querySelector('.loading').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Add heartbeat sound on hover (optional - requires user interaction)
+        let audioContext;
+        function playHeartbeat() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            // Simple heartbeat sound using oscillator
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 100;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        // Add subtle heartbeat on button hover
+        document.querySelectorAll('.btn, .final-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                if (audioContext) playHeartbeat();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -148,19 +148,31 @@ class Capsule {
     }
 
     createEmojiLabel() {
-        // Create HTML element for emoji
+        // Create HTML element for animated emoji GIF
         const emojiDiv = document.createElement('div');
         emojiDiv.className = 'capsule-emoji';
-        emojiDiv.textContent = this.dayData.emoji;
+
+        // Create img element for animated GIF
+        const emojiImg = document.createElement('img');
+        emojiImg.src = this.dayData.animatedEmoji || this.dayData.emoji;
+        emojiImg.alt = this.dayData.emoji;
+        emojiImg.style.cssText = `
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        `;
+
+        emojiDiv.appendChild(emojiImg);
+
         emojiDiv.style.cssText = `
-            font-size: 4rem;
             user-select: none;
             pointer-events: auto;
             cursor: pointer;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8);
             filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.9));
             z-index: 10;
             transition: transform 0.3s ease, filter 0.3s ease;
+            animation: floatEmoji 3s ease-in-out infinite;
+            animation-delay: ${this.dayIndex * 0.2}s;
         `;
 
         // Add hover effect

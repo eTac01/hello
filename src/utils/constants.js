@@ -36,72 +36,80 @@ export const TIMELINE = [
         day: 'Rose Day',
         theme: 'Admiration',
         emoji: '🌹',
+        animatedEmoji: 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f339/512.gif',
         index: 0,
         experience: 'RoseDay',
-        url: '/rose-day.html'
+        url: 'rose-day.html'
     },
     {
         date: '2026-02-08',
         day: 'Propose Day',
         theme: 'Confession',
         emoji: '💍',
+        animatedEmoji: 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f48d/512.gif',
         index: 1,
         experience: 'ProposeDay',
-        url: '/propose-day.html'
+        url: 'propose-day.html'
     },
     {
         date: '2026-02-09',
         day: 'Chocolate Day',
         theme: 'Sweetness',
         emoji: '🍫',
+        animatedEmoji: 'emoji/chocoletday.webp',
         index: 2,
         experience: 'ChocolateDay',
-        url: '/chocolate-day.html'
+        url: 'chocolate-day.html'
     },
     {
         date: '2026-02-10',
         day: 'Teddy Day',
         theme: 'Comfort',
         emoji: '🧸',
+        animatedEmoji: 'emoji/teddyday.webp',
         index: 3,
         experience: 'TeddyDay',
-        url: '/teddy-day.html'
+        url: 'teddy-day.html'
     },
     {
         date: '2026-02-11',
         day: 'Promise Day',
         theme: 'Trust',
         emoji: '🤝',
+        animatedEmoji: 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f91d/512.gif',
         index: 4,
         experience: 'PromiseDay',
-        url: '/promise-day.html'
+        url: 'promise-day.html'
     },
     {
         date: '2026-02-12',
         day: 'Hug Day',
         theme: 'Warmth',
         emoji: '🤗',
+        animatedEmoji: 'emoji/bear-hug.webp',
         index: 5,
         experience: 'HugDay',
-        url: '/hug-day.html'
+        url: 'hug-day.html'
     },
     {
         date: '2026-02-13',
         day: 'Kiss Day',
         theme: 'Intimacy',
         emoji: '💋',
+        animatedEmoji: 'emoji/kissday.gif',
         index: 6,
         experience: 'KissDay',
-        url: '/kiss-day.html'
+        url: 'kiss-day.html'
     },
     {
         date: '2026-02-14',
         day: "Valentine's Day",
         theme: 'Union',
         emoji: '❤️',
+        animatedEmoji: 'https://fonts.gstatic.com/s/e/notoemoji/latest/2764_fe0f/512.gif',
         index: 7,
         experience: 'ValentineDay',
-        url: '/valentine-day.html'
+        url: 'valentine-day.html'
     }
 ];
 

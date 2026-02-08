@@ -4,6 +4,7 @@
  */
 
 import './styles/main.css';
+import './styles/emoji-animations.css';
 import SceneManager from './core/SceneManager.js';
 import { timeGatekeeper } from './core/TimeGatekeeper.js';
 import LandingScene from './components/LandingScene.js';
@@ -113,8 +114,8 @@ class App {
                 loadingScreen.classList.add('fade-out');
                 setTimeout(() => {
                     loadingScreen.remove();
-                }, 1000);
-            }, 500);
+                }, 500); // Reduced from 1000ms to 500ms
+            }, 2500); // Reduced from 500ms to 2500ms for total ~3 seconds
         }
     }
 
