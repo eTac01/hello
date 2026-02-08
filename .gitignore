@@ -3,7 +3,7 @@ node_modules/
 .pnpm-debug.log*
 
 # Build output
-dist/
+# dist/ - Commented out for GitHub Pages deployment
 *.local
 
 # Editor
