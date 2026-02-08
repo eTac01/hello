@@ -605,6 +605,17 @@
                 height: 70px;
                 font-size: 2rem;
             }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .game-button {
+                width: 100%;
+                max-width: 300px;
+            }
         }
 
         /* Loading Animation */
@@ -778,7 +789,8 @@
         <!-- Completion Screen -->
         <div class="level" id="completion">
             <h1 class="level-title">Congratulations!<br>You survived Chocolate Day...<br>And somehow made it sweeter
-                <span class="emoji-float">🍫💖</span></h1>
+                <span class="emoji-float">🍫💖</span>
+            </h1>
             <div class="button-group">
                 <button class="game-button btn-secondary" onclick="game.restart()">Restart Game 🔁</button>
                 <button class="game-button btn-primary" onclick="game.claimWish()">Claim Chocolate Day Wish 🍫✨</button>

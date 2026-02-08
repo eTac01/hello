@@ -96,7 +96,7 @@ export const TIMELINE = [
         day: 'Kiss Day',
         theme: 'Intimacy',
         emoji: '💋',
-        animatedEmoji: 'emoji/kissday.gif',
+        animatedEmoji: 'emoji/kissday.webp',
         index: 6,
         experience: 'KissDay',
         url: 'kiss-day.html'
