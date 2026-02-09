@@ -608,7 +608,7 @@
 
         <section class="stage active" data-step="0">
           <p class="prompt-line">Hey… you don’t have to rush here.</p>
-          <small>Press enter to begin.</small>
+          <button id="startBtn" class="yes">Begin 🤍</button>
         </section>
 
         <section class="stage" data-step="1">
@@ -1303,14 +1303,25 @@ That’s why girls emotionally connect with sky + grass anime scenes.
       });
     }
 
-    function setupKeyboardStart() {
-      document.addEventListener('keydown', (event) => {
-        if (stepIndex === 0 && (event.key === 'Enter' || event.key === ' ')) {
+    function setupStartInteraction() {
+      const startBtn = document.getElementById('startBtn');
+      const startAction = () => {
+        if (stepIndex === 0) {
           showStep(1);
           setTimeout(() => {
             showStep(2);
             animateBars();
           }, 1800);
+        }
+      };
+
+      if (startBtn) {
+        startBtn.addEventListener('click', startAction);
+      }
+
+      document.addEventListener('keydown', (event) => {
+        if (stepIndex === 0 && (event.key === 'Enter' || event.key === ' ')) {
+          startAction();
         }
       });
     }
@@ -1455,7 +1466,7 @@ That’s why girls emotionally connect with sky + grass anime scenes.
     window.addEventListener('resize', scaleFrame);
     scaleFrame();
     rotateBackground();
-    setupKeyboardStart();
+    setupStartInteraction();
     setupFlirtyRotation();
     setupInputGates();
     setupConsentButtons();
