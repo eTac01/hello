@@ -26,13 +26,11 @@ class TeddyDay extends BaseExperience {
     }
 
     async init() {
-        this.createComfortParticles();
-        this.createCenterGlow();
-        this.setupInteraction();
+        // Redirect to the standalone Teddy Day experience
+        window.location.href = 'teddy/index.html';
 
-        await super.init();
-
-        this.unsubscribeUpdate = this.sceneManager.onUpdate(this.update.bind(this));
+        // Return a promise that never resolves to pause the current scene while redirecting
+        return new Promise(() => { });
     }
 
     createComfortParticles() {
