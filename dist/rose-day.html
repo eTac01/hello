@@ -35,7 +35,41 @@
             position: relative;
         }
 
-        /* Custom Cursor CSS removed - handled by smooth-cursor.js */
+        /* Custom Cursor */
+        .cursor {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--blush-pink);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            mix-blend-mode: screen;
+            opacity: 0.6;
+        }
+
+        .cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: var(--blush-pink);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor.hover {
+            transform: scale(2);
+            opacity: 1;
+            border-color: var(--soft-gold);
+        }
+
+        .cursor.hover::before {
+            background: var(--soft-gold);
+        }
 
         /* Background Environment */
         .environment {
@@ -1356,7 +1390,7 @@
                 }, i * 300);
             });
 
-            // setupHoverStates(); // Removed as handled by smooth-cursor.js
+            setupHoverStates();
         }
 
         // Answer selection
@@ -1431,7 +1465,7 @@
                 grid.appendChild(card);
             });
 
-            // setupHoverStates(); // Removed as handled by smooth-cursor.js
+            setupHoverStates();
         }
 
         function flipCard(card) {
@@ -1530,7 +1564,7 @@
                 plot.style.borderColor = 'var(--blush-pink)';
             });
 
-            // setupHoverStates(); // Removed as handled by smooth-cursor.js
+            setupHoverStates();
         }
 
         // Rose number meanings
@@ -1594,7 +1628,7 @@
         // Initialize everything
         window.addEventListener('load', () => {
             createParticles();
-            // setupHoverStates(); // Removed as handled by smooth-cursor.js
+            setupHoverStates();
 
             setTimeout(() => {
                 document.querySelector('.loading').classList.add('hidden');
@@ -1629,7 +1663,6 @@
             }, 3000);
         });
     </script>
-    <script src="js/smooth-cursor.js"></script>
 </body>
 
 </html>

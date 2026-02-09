@@ -7,6 +7,7 @@ import './styles/main.css';
 import './styles/emoji-animations.css';
 import SceneManager from './core/SceneManager.js';
 import { timeGatekeeper } from './core/TimeGatekeeper.js';
+import { securityManager } from './core/SecurityManager.js';
 import LandingScene from './components/LandingScene.js';
 import { TIMELINE } from './utils/constants.js';
 
@@ -31,6 +32,9 @@ class App {
     }
 
     async init() {
+        // Initialize Security Logic
+        securityManager.init();
+
         // Setup manipulation detection
         timeGatekeeper.onManipulationDetected = this.onManipulationDetected.bind(this);
 

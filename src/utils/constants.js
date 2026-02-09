@@ -69,7 +69,7 @@ export const TIMELINE = [
         animatedEmoji: 'emoji/teddyday.webp',
         index: 3,
         experience: 'TeddyDay',
-        url: 'teddy-day.html'
+        url: 'teddy/index.html'
     },
     {
         date: '2026-02-11',
