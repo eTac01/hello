@@ -52,25 +52,20 @@ class KissDay extends BaseExperience {
     }
 
     setupInteraction() {
-        this.mousePos = { x: 0, y: 0 };
-        this.boundMouseMove = (e) => {
-            this.mousePos.x = (e.clientX / window.innerWidth) * 2 - 1;
-            this.mousePos.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        this.onDoubleClick = () => {
+            if (!this.isActive || this.isCompleted) return;
+            this.onComplete_();
         };
-        window.addEventListener('mousemove', this.boundMouseMove);
+        window.addEventListener('dblclick', this.onDoubleClick);
     }
+
 
     update(delta, elapsed) {
         if (!this.isActive) return;
 
-        const t1X = -2 + (1 - Math.abs(this.mousePos.x)) * 1.5;
-        const t2X = 2 - (1 - Math.abs(this.mousePos.x)) * 1.5;
-
-        this.particles1.position.x += (t1X - this.particles1.position.x) * 0.02;
-        this.particles2.position.x += (t2X - this.particles2.position.x) * 0.02;
-
-        const dist = this.particles1.position.distanceTo(this.particles2.position);
-        if (dist < 1 && !this.isCompleted) this.onComplete_();
+        // Idle animation
+        this.particles1.position.y = Math.sin(elapsed * 0.5) * 0.2;
+        this.particles2.position.y = Math.cos(elapsed * 0.5) * 0.2;
     }
 
     async onComplete_() {
@@ -81,7 +76,7 @@ class KissDay extends BaseExperience {
 
     dispose() {
         if (this.unsubscribeUpdate) this.unsubscribeUpdate();
-        window.removeEventListener('mousemove', this.boundMouseMove);
+        window.removeEventListener('dblclick', this.onDoubleClick);
         super.dispose();
     }
 }

@@ -38,7 +38,8 @@ class Capsule {
             emissive: COLORS_HEX.champagneGold,
             emissiveIntensity: 0.2,
             transparent: true,
-            opacity: 0 // Make invisible - only emojis will be visible
+            opacity: 0, // Hidden per user request
+            depthWrite: false // Prevent depth writing when invisible
         });
 
         this.mesh = new THREE.Mesh(geometry, this.material);
@@ -365,7 +366,7 @@ class Capsule {
         gsap.to(this.material, {
             metalness: 0.4,
             roughness: 0.3,
-            opacity: 1,
+            // opacity: 1, // Keep hidden
             duration: 1,
             ease: 'power2.out'
         });
@@ -377,17 +378,17 @@ class Capsule {
             duration: 1
         });
 
-        // Enable glow
-        gsap.to(this.glowMesh.material.uniforms.uIntensity, {
-            value: 0.8,
-            duration: 1
-        });
+        // Enable glow - DISABLED
+        // gsap.to(this.glowMesh.material.uniforms.uIntensity, {
+        //     value: 0.8,
+        //     duration: 1
+        // });
 
-        // Show particles
-        gsap.to(this.particles.material, {
-            opacity: 0.8,
-            duration: 1
-        });
+        // Show particles - DISABLED
+        // gsap.to(this.particles.material, {
+        //     opacity: 0.8,
+        //     duration: 1
+        // });
     }
 
     /**
@@ -397,7 +398,7 @@ class Capsule {
         gsap.to(this.material, {
             metalness: 0.1,
             roughness: 0.9,
-            opacity: 0.3,
+            // opacity: 0.3, // Keep hidden
             duration: 1,
             ease: 'power2.out'
         });
@@ -410,17 +411,17 @@ class Capsule {
             duration: 1
         });
 
-        // Disable glow
-        gsap.to(this.glowMesh.material.uniforms.uIntensity, {
-            value: 0,
-            duration: 1
-        });
+        // Disable glow - DISABLED
+        // gsap.to(this.glowMesh.material.uniforms.uIntensity, {
+        //     value: 0,
+        //     duration: 1
+        // });
 
-        // Fade particles
-        gsap.to(this.particles.material, {
-            opacity: 0.1,
-            duration: 1
-        });
+        // Fade particles - DISABLED
+        // gsap.to(this.particles.material, {
+        //     opacity: 0.1,
+        //     duration: 1
+        // });
     }
 
     /**
@@ -430,7 +431,7 @@ class Capsule {
         gsap.to(this.material, {
             metalness: 0.2,
             roughness: 0.8,
-            opacity: 0.4,
+            // opacity: 0.4, // Keep hidden
             duration: 1,
             ease: 'power2.out'
         });
@@ -443,17 +444,17 @@ class Capsule {
             duration: 1
         });
 
-        // Minimal glow
-        gsap.to(this.glowMesh.material.uniforms.uIntensity, {
-            value: 0.15,
-            duration: 1
-        });
+        // Minimal glow - DISABLED
+        // gsap.to(this.glowMesh.material.uniforms.uIntensity, {
+        //     value: 0.15,
+        //     duration: 1
+        // });
 
-        // Hide particles
-        gsap.to(this.particles.material, {
-            opacity: 0.2,
-            duration: 1
-        });
+        // Hide particles - DISABLED
+        // gsap.to(this.particles.material, {
+        //     opacity: 0.2,
+        //     duration: 1
+        // });
     }
 
     /**

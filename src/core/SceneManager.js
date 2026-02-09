@@ -341,9 +341,9 @@ class SceneManager {
             this.ambientParticles.rotation.y += 0.0001;
         }
 
-        // Subtle camera movement based on mouse
-        this.camera.position.x += (this.mouse.x * 0.5 - this.camera.position.x) * 0.02;
-        this.camera.position.y += (this.mouse.y * 0.3 + 2 - this.camera.position.y) * 0.02;
+        // Subtle camera movement based on mouse - DISABLED per user request
+        // this.camera.position.x += (this.mouse.x * 0.5 - this.camera.position.x) * 0.02;
+        // this.camera.position.y += (this.mouse.y * 0.3 + 2 - this.camera.position.y) * 0.02;
 
         // Call registered callbacks
         this.callbacks.forEach(cb => cb(delta, elapsed));
