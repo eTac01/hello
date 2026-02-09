@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover" />
+  <title>Teddy Day – Stay With Me in This Universe</title>
+  <style>
+    :root {
+      --design-w: 3840;
+      --design-h: 2160;
+      --blush: #f6c2d1;
+      --lavender: #cbb6ff;
+      --rose-gold: #e8b58a;
+      --peach: #f9c7a6;
+      --wine: #3b1e2b;
+      --sky: #7db2ff;
+      --cream: #f6efe6;
+      --text: #f6f1ec;
+      --shadow: rgba(10, 8, 12, 0.6);
+      --glow: rgba(255, 183, 213, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background: #0b0a12;
+      color: var(--text);
+      font-family: "Cormorant Garamond", "Georgia", serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0a12;
+    }
+
+    .frame {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: calc(var(--design-w) * 1px);
+      height: calc(var(--design-h) * 1px);
+      transform-origin: center;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      /* Initial state before JS takes over */
+    }
+
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+      filter: saturate(1.1) contrast(1.02) brightness(0.98);
+      opacity: 0;
+      transition: opacity 3s ease;
+      z-index: 0;
+    }
+
+    .bg-layer.active {
+      opacity: 1;
+    }
+
+    .bg-1 {
+      --bg: url("assets/b1.png");
+      background-image: var(--bg);
+    }
+
+    .bg-2 {
+      --bg: url("assets/unnamed.jpg");
+      background-image: var(--bg);
+    }
+
+    /* Only two background images are used. */
+
+    .bg-grading {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 15%, rgba(255, 214, 235, 0.75), transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(214, 199, 255, 0.65), transparent 58%),
+        radial-gradient(circle at 50% 70%, rgba(249, 199, 166, 0.45), transparent 60%),
+        linear-gradient(180deg, rgba(16, 10, 18, 0.35), rgba(26, 12, 22, 0.75));
+      mix-blend-mode: screen;
+      opacity: 0.72;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 160px;
+      text-align: center;
+      gap: 36px;
+    }
+
+    .title {
+      font-size: 72px;
+      letter-spacing: 1px;
+      text-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .subtitle {
+      font-size: 38px;
+      max-width: 1100px;
+      line-height: 1.4;
+      color: rgba(255, 248, 240, 0.92);
+      text-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .stage {
+      width: min(1200px, 90%);
+      min-height: 420px;
+      padding: 48px 56px;
+      border-radius: 28px;
+      background: rgba(12, 10, 18, 0.62);
+      box-shadow: 0 30px 80px rgba(8, 6, 12, 0.55);
+      backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stage.active {
+      display: flex;
+      animation: fadeIn 1.6s ease;
+    }
+
+    .stage p {
+      font-size: 34px;
+      line-height: 1.55;
+      max-width: 900px;
+    }
+
+    .stage small {
+      font-family: "Manrope", "Helvetica", sans-serif;
+      font-size: 20px;
+      letter-spacing: 0.4px;
+      color: rgba(255, 237, 228, 0.7);
+    }
+
+    .hint {
+      font-size: 22px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: rgba(255, 210, 230, 0.8);
+    }
+
+    .input-area {
+      width: 100%;
+      max-width: 900px;
+      min-height: 160px;
+      padding: 22px 24px;
+      font-size: 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 214, 235, 0.4);
+      background: rgba(8, 7, 12, 0.45);
+      color: #fffaf4;
+      resize: none;
+      outline: none;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 16px 34px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, rgba(246, 194, 209, 0.9), rgba(232, 181, 138, 0.9));
+      color: #2a0f1b;
+      font-size: 22px;
+      font-family: "Manrope", "Helvetica", sans-serif;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease;
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #f7ecf4;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .teddy-wrap {
+      position: relative;
+      width: 380px;
+      height: 420px;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.45));
+    }
+
+    .teddy-wrap.close {
+      transform: scale(1.08) translateY(10px);
+      transition: transform 2s ease;
+    }
+
+    .teddy-wrap.waiting {
+      transform: scale(0.98) translateY(6px);
+      opacity: 0.8;
+      transition: transform 1.4s ease, opacity 1.4s ease;
+    }
+
+    .teddy {
+      position: relative;
+      width: 260px;
+      height: 320px;
+      border-radius: 140px;
+      background: radial-gradient(circle at 30% 20%, #f5d7bf, #d29a74 60%, #aa6c50 100%);
+      animation: breathe 6s ease-in-out infinite;
+    }
+
+    .teddy::before,
+    .teddy::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #f8e2cd, #d6a17f 70%);
+      top: -30px;
+    }
+
+    .teddy::before {
+      left: -35px;
+    }
+
+    .teddy::after {
+      right: -35px;
+    }
+
+    .teddy-face {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 140px;
+      border-radius: 60% 60% 50% 50%;
+      background: radial-gradient(circle at 30% 20%, #fbe8d4, #e1b091 75%);
+    }
+
+    .teddy-heart {
+      position: absolute;
+      left: 50%;
+      top: 160px;
+      width: 90px;
+      height: 90px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 30%, rgba(255, 183, 213, 0.9), rgba(255, 110, 166, 0.2));
+      box-shadow: 0 0 30px rgba(255, 128, 180, 0.5);
+      animation: heartbeat 2.6s infinite;
+    }
+
+    .teddy-heart::before,
+    .teddy-heart::after {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 168, 200, 0.6);
+      border-radius: 50%;
+      top: 10px;
+    }
+
+    .teddy-heart::before {
+      left: 12px;
+    }
+
+    .teddy-heart::after {
+      right: 12px;
+    }
+
+    .teddy-nose {
+      position: absolute;
+      top: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 30px;
+      border-radius: 40% 40% 50% 50%;
+      background: #7a4a3b;
+    }
+
+    .teddy-eyes {
+      position: absolute;
+      top: 65px;
+      left: 50%;
+      width: 100px;
+      display: flex;
+      justify-content: space-between;
+      transform: translateX(-50%);
+    }
+
+    .teddy-eyes span {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #2d1c1b;
+      box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.25);
+    }
+
+    .teddy-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(circle, rgba(255, 206, 233, 0.4), transparent 60%);
+      opacity: 0.6;
+      animation: glowPulse 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .ai-panel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      font-family: "Manrope", "Helvetica", sans-serif;
+      font-size: 22px;
+    }
+
+    .bar {
+      width: 80%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, rgba(255, 200, 220, 0.9), rgba(255, 150, 200, 0.9));
+      transition: width 1.6s ease;
+    }
+
+    .ai-tag {
+      font-size: 20px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 223, 232, 0.8);
+    }
+
+    .prompt-line {
+      font-size: 30px;
+      font-style: italic;
+    }
+
+    .puzzle {
+      width: 900px;
+      height: 420px;
+      position: relative;
+      border-radius: 24px;
+      background: rgba(18, 14, 22, 0.55);
+      border: 1px solid rgba(255, 205, 225, 0.2);
+      overflow: hidden;
+    }
+
+    .piece {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 20px;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 220, 240, 0.9), rgba(166, 120, 200, 0.8));
+      display: grid;
+      place-items: center;
+      color: #2a1122;
+      font-family: "Manrope", "Helvetica", sans-serif;
+      cursor: grab;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+
+    .slot {
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 22px;
+      border: 2px dashed rgba(255, 210, 230, 0.5);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      color: rgba(255, 236, 245, 0.7);
+    }
+
+    .slot.filled {
+      border-style: solid;
+      color: rgba(255, 236, 245, 1);
+      box-shadow: 0 0 20px rgba(255, 170, 210, 0.4);
+    }
+
+    .hold-button {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hold-progress {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(-100%);
+      transition: transform 0.1s linear;
+    }
+
+    .final-text {
+      font-size: 34px;
+      line-height: 1.5;
+      max-width: 1000px;
+    }
+
+    .floating-note {
+      position: absolute;
+      bottom: 40px;
+      right: 60px;
+      font-family: "Manrope", "Helvetica", sans-serif;
+      font-size: 18px;
+      color: rgba(255, 240, 235, 0.65);
+      max-width: 420px;
+      text-align: right;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.03);
+      }
+    }
+
+    @keyframes heartbeat {
+      0% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.7;
+      }
+
+      10% {
+        transform: translateX(-50%) scale(1.08);
+        opacity: 0.95;
+      }
+
+      20% {
+        transform: translateX(-50%) scale(0.98);
+        opacity: 0.85;
+      }
+
+      30% {
+        transform: translateX(-50%) scale(1.12);
+        opacity: 1;
+      }
+
+      45% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes glowPulse {
+
+      0%,
+      100% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 0.9;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .content {
+        padding: 60px 30px;
+        gap: 20px;
+      }
+
+      .title {
+        font-size: 46px;
+      }
+
+      .subtitle {
+        font-size: 24px;
+      }
+
+      .stage {
+        padding: 28px 24px;
+      }
+
+      .stage p {
+        font-size: 22px;
+      }
+
+      .input-area {
+        font-size: 18px;
+      }
+
+      button {
+        font-size: 18px;
+      }
+
+      .teddy-wrap {
+        transform: scale(0.8);
+      }
+
+      .puzzle {
+        width: 100%;
+        height: 360px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="viewport">
+    <div class="bg-layer bg-1 active" id="bg1"></div>
+    <div class="bg-layer bg-2" id="bg2"></div>
+    <!-- Third background removed by request -->
+    <div class="bg-grading"></div>
+    <div class="grain"></div>
+
+    <div class="frame" id="frame">
+      <div class="content">
+        <div class="title">Teddy Day – Stay With Me in This Universe</div>
+        <div class="subtitle">A quiet, consent-led romance where comfort becomes a living presence.</div>
+
+        <section class="stage active" data-step="0">
+          <p class="prompt-line">Hey… you don’t have to rush here.</p>
+          <small>Press enter to begin.</small>
+        </section>
+
+        <section class="stage" data-step="1">
+          <p>Some things aren’t meant to be asked.<br />They’re meant to be held.</p>
+          <small class="hint">Finding the best teddy on the internet…</small>
+        </section>
+
+        <section class="stage" data-step="2">
+          <div class="teddy-wrap" id="teddyWrap">
+            <div class="teddy-glow"></div>
+            <div class="teddy" id="teddy">
+              <div class="teddy-face">
+                <div class="teddy-eyes"><span></span><span></span></div>
+                <div class="teddy-nose"></div>
+              </div>
+              <div class="teddy-heart" id="teddyHeart"></div>
+            </div>
+          </div>
+          <div class="ai-panel">
+            <div class="ai-tag">AI Comfort Engine™</div>
+            <div>Analyzing softness… warmth… hug-ability…</div>
+            <div class="bar"><span data-bar="1"></span></div>
+            <div class="bar"><span data-bar="1"></span></div>
+            <div class="bar"><span data-bar="1"></span></div>
+            <div>Softness: 100% · Comfort: 100% · Late-night hugs: 100%</div>
+            <div><strong>Rating: 10/10 🧸🤍</strong></div>
+            <div>“No debate. This one wins.”</div>
+            <small>Tap the teddy to continue.</small>
+          </div>
+        </section>
+
+        <section class="stage" data-step="3">
+          <p>If this teddy were here right now…<br />what would you do?</p>
+          <textarea class="input-area" placeholder="If this teddy were here right now…\nwhat would you do?"
+            data-requires-input></textarea>
+          <div class="buttons">
+            <button id="continueAfterInput" disabled>Continue</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="4">
+          <p>Careful…<br />holding something this soft<br />makes it hard to let go 😌🧸</p>
+          <p class="prompt-line" id="flirtyRotate">It’s meant to be held close… very close.</p>
+          <div class="buttons">
+            <button class="yes">Yes, stay close 🤍</button>
+            <button class="secondary no">No, pause here</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="5">
+          <p>If I were there…<br />I’d make sure you didn’t need it anymore.</p>
+          <p>But until then… let it do the job.</p>
+          <div class="buttons">
+            <button class="yes">Yes, let it stay 🤍</button>
+            <button class="secondary no">No, not yet</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="6">
+          <p>When you’re tired of the world…<br />what kind of silence do you need?</p>
+          <textarea class="input-area" placeholder="Tell me what silence feels safe…" data-requires-input></textarea>
+          <p class="prompt-line">I’d sit with you in that silence… quietly.</p>
+          <div class="buttons">
+            <button class="yes" disabled>Yes, stay with me 🤍</button>
+            <button class="secondary no">No, pause here</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="7">
+          <p>Do you like being held…<br />or just knowing someone won’t leave?</p>
+          <textarea class="input-area" placeholder="Answer in your own words…" data-requires-input></textarea>
+          <p class="prompt-line">I wouldn’t leave. Even if you pushed.</p>
+          <div class="buttons">
+            <button class="yes" disabled>Yes, don’t leave 😌</button>
+            <button class="secondary no">No</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="8">
+          <p>If I were next to you right now…<br />would you lean in, or pretend not to notice?</p>
+          <textarea class="input-area" placeholder="Tell me your quiet truth…" data-requires-input></textarea>
+          <p class="prompt-line">Either way… I’d notice.</p>
+          <div class="buttons">
+            <button class="yes" disabled>Yes, notice me 🤍</button>
+            <button class="secondary no">No</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="9">
+          <p>The universe breaks into fragments. Fit them together.</p>
+          <div class="puzzle" id="puzzle">
+            <div class="slot" data-slot="1" style="left: 80px; top: 50px;">Quiet hugs</div>
+            <div class="slot" data-slot="2" style="left: 320px; top: 200px;">Late-night talks</div>
+            <div class="slot" data-slot="3" style="left: 560px; top: 50px;">Shared silence</div>
+            <div class="slot" data-slot="4" style="left: 720px; top: 220px;">Soft jealousy</div>
+
+            <div class="piece" data-piece="1" style="left: 40px; top: 260px;">Hug</div>
+            <div class="piece" data-piece="2" style="left: 240px; top: 20px;">Talk</div>
+            <div class="piece" data-piece="3" style="left: 520px; top: 250px;">Silence</div>
+            <div class="piece" data-piece="4" style="left: 720px; top: 20px;">Jealousy</div>
+          </div>
+          <p class="prompt-line">We fit better than I expected.</p>
+          <div class="buttons">
+            <button class="yes" id="puzzleYes" disabled>Yes, we fit ✨</button>
+            <button class="secondary no">No</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="10">
+          <p>You know…<br />if I were there,<br />this teddy wouldn’t stand a chance 😌🧸</p>
+          <p>But only if you want that.</p>
+          <div class="buttons">
+            <button class="yes">Yes, I want that 🤍</button>
+            <button class="secondary no">No</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="11">
+          <p>If this universe stayed like this…<br />just us and this quiet…<br />would you stay?</p>
+          <textarea class="input-area" placeholder="Answer slowly…" data-requires-input></textarea>
+          <div class="buttons">
+            <button class="yes" id="finalYes" disabled>Yes, I’ll stay 🌌</button>
+            <button class="secondary no">No</button>
+          </div>
+        </section>
+
+        <section class="stage" data-step="12">
+          <p class="final-text">Hold the teddy 🤍</p>
+          <div class="buttons">
+            <button class="hold-button" id="holdButton">
+              Hold the teddy 🤍
+              <span class="hold-progress" id="holdProgress"></span>
+            </button>
+          </div>
+          <p class="final-text" id="finalWhisper">Happy Teddy Day.<br />In every universe you choose… I’m here.</p>
+        </section>
+      </div>
+
+      <div class="floating-note" id="statusNote">This space waits for you.</div>
+    </div>
+  </div>
+
+  <pre id="prompt-lines" class="hidden">
+🧸🌌💖 MASTER PROMPT FOR CLAUDE AI
+Project: Teddy Day – Stay With Me in This Universe
+🎯 CORE OBJECTIVE
+
+Design and generate an ultra-romantic, emotionally complex, puzzle-based Teddy Day web experience where:
+
+A living teddy (heartbeat + breathing) represents constant presence
+
+The setting is a soft eternal universe
+
+A boyfriend asks deep, flirty, intimate questions
+
+After every flirty line, the user must choose YES or NO
+
+Progress is locked unless the user consciously agrees
+
+The experience feels slow, safe, intimate, and intentional
+
+This is not scrolling romance.
+This is choosing to stay, step by step.
+
+🌌 CORE CONCEPT
+“Love isn’t rushed. It’s chosen.”
+
+The universe only expands when the user allows it.
+
+🎨 ROMANTIC COLOR GRADING (IMPORTANT)
+
+Use colors emotionally preferred by most girls:
+
+Blush pink 🌸
+
+Soft lavender 💜
+
+Rose gold ✨
+
+Warm peach 🍑
+
+Deep wine shadows 🍷
+
+Lighting:
+
+Cinematic bloom
+
+Soft contrast
+
+Skin-tone friendly
+
+Dreamlike glow
+
+🧸 STAGE 1 — ENTER THE ETERNAL NIGHT
+
+Visuals:
+
+Infinite starfield
+
+Rose-pink nebula fog
+
+Floating heart-light particles
+
+Text:
+
+“If I had all the universes…
+I’d still choose this moment with you.”
+
+A realistic teddy appears, floating gently.
+
+Button:
+
+Enter this universe ✨
+
+🫀🧸 STAGE 2 — THE TEDDY IS ALIVE
+
+Live effects (MANDATORY):
+
+🫀 Heartbeat glow beneath chest
+
+🌬️ Breathing motion
+
+Heartbeat reacts to hover, touch, press & hold
+
+Text:
+
+“I wanted something that could stay with you
+when I can’t.”
+
+Consent Gate
+
+Buttons:
+
+Yes, let it stay 🤍
+
+No, not yet
+
+❗ Only Yes allows progression.
+If No, the teddy steps back slightly and waits.
+
+🧩 STAGE 3 — BOYFRIEND QUESTIONS (GATED)
+
+Questions appear one at a time.
+Each question requires input + YES confirmation.
+
+🌙 Question 1
+
+“When you’re tired of the world…
+what kind of silence do you need?”
+
+User types answer.
+
+Flirty response:
+
+“I’d sit with you in that silence… quietly.”
+
+Consent Gate
+
+Yes, stay with me 🤍
+
+No
+
+🌙 Question 2
+
+“Do you like being held…
+or just knowing someone won’t leave?”
+
+After input, flirty line:
+
+“I wouldn’t leave. Even if you pushed.”
+
+Consent Gate
+
+Yes, don’t leave 😌
+
+No
+
+🌙 Question 3
+
+“If I were next to you right now…
+would you lean in, or pretend not to notice?”
+
+Flirty escalation:
+
+“Either way… I’d notice.”
+
+Consent Gate
+
+Yes, notice me 🤍
+
+No
+
+🧩 STAGE 4 — THE PUZZLE OF FOREVER (LOCKED BY CONSENT)
+
+A constellation puzzle appears.
+
+While solving, boyfriend whispers fade in:
+
+“Take your time… I’m right here.”
+
+“I like watching you think.”
+
+Puzzle completion triggers flirty line:
+
+“We fit better than I expected.”
+
+Consent Gate
+
+Yes, we fit ✨
+
+No
+
+🔥 STAGE 5 — DIRTY-FLIRTY MOMENT (SAFE, SUGGESTIVE)
+
+Teddy heartbeat deepens.
+
+Line:
+
+“You know…
+if I were there,
+this teddy wouldn’t stand a chance 😌🧸”
+
+Immediate softness:
+
+“But only if you want that.”
+
+Consent Gate (VERY IMPORTANT)
+
+Yes, I want that 🤍
+
+No
+
+If No:
+
+Teddy relaxes
+
+Tone softens
+
+Line changes to:
+
+“That’s okay. I’m still here.”
+
+🌌 STAGE 6 — THE ETERNAL QUESTION
+
+Final question:
+
+“If this universe stayed like this…
+just us and this quiet…
+would you stay?”
+
+User types answer.
+
+Final Consent Gate
+
+Yes, I’ll stay 🌌
+
+No
+
+Only Yes unlocks the ending.
+
+🧸 FINAL ACTION — HOLD FOREVER
+
+Button:
+
+Hold the teddy 🤍
+
+Press & hold:
+
+Heartbeat syncs
+
+Breathing slows
+
+Universe stabilizes
+
+Colors warm
+
+Final text:
+
+“Happy Teddy Day.
+In every universe you choose…
+I’m here.”
+
+🧑‍💻 TECHNICAL EXPECTATIONS
+
+Generate:
+
+Vanilla JS (ES6+)
+
+Three.js universe + teddy
+
+Real-time heartbeat shader
+
+GSAP easing
+
+State-based consent gating
+
+Mobile & desktop support
+
+Reduced-motion mode
+
+🧠 FINAL INSTRUCTION TO CLAUDE
+
+Build this like consent-driven romance.
+Every step forward is chosen.
+Every pause is respected.
+This should feel safe, intimate, and unforgettable.
+Love here is not assumed — it’s accepted.
+
+If you want:
+
+💌 Promise Day → vows with consent gates
+
+💋 Kiss Day → tension + choice
+
+❤️ Valentine’s Day → final union of the universe
+
+Just say the day.
+
+🌤️ Background Concept
+“A quiet sky where time slows down”
+
+Inspired by Makoto Shinkai–style anime worlds (like Suzume) — peaceful, airy, emotional.
+
+🎨 VISUAL DESIGN BREAKDOWN (VERY IMPORTANT)
+🌌 Sky
+
+Bright yet soft blue sky
+
+Large, fluffy white clouds
+
+Slow cloud movement (almost unnoticeable)
+
+Subtle light bloom around clouds
+
+Slight gradient:
+
+Top: calm sky blue
+
+Horizon: warm pastel peach/pink
+
+This sky must feel hopeful, gentle, and safe.
+
+🌬️ Air & Wind
+
+Floating dust / pollen particles
+
+Light breeze effect (left → right)
+
+Occasional lens flare glints
+
+Soft ambient motion (never fast)
+
+Wind should feel like:
+
+“You can breathe here.”
+
+🌱 Grass Field
+
+Tall, soft green grass
+
+Individual blades sway differently
+
+Wind ripple waves pass through the field
+
+Warm sunlight highlights grass tips
+
+No sharp contrast, no dark shadows
+
+Grass color palette:
+
+Soft emerald green
+
+Light yellow-green highlights
+
+Warm sunlight tones
+
+🌸 Emotional Color Grading (Girls LOVE THIS)
+
+Use romantic pastel grading:
+
+Sky blue 💙
+
+Soft lavender 💜
+
+Peach light 🍑
+
+Gentle gold ☀️
+
+Add:
+
+Slight film grain
+
+Dream-like blur in the distance
+
+Depth-of-field (foreground grass sharp, background soft)
+
+🧸 HOW IT CONNECTS TO TEDDY DAY
+
+In this background:
+
+The teddy floats or sits gently in grass
+
+Wind moves the teddy fur slightly
+
+The teddy’s heartbeat glow contrasts softly with the sky
+
+The universe feels open, not closed
+
+This creates:
+
+Comfort + freedom + emotional safety
+
+🧠 INTERACTION MAGIC
+
+When the user:
+
+Moves mouse / finger → grass subtly leans
+
+Scrolls → clouds shift slightly
+
+Holds teddy → wind slows, sky warms
+
+Answers questions → sunlight becomes warmer
+
+The background reacts emotionally — not mechanically.
+
+🧑‍💻 TECHNICAL IMPLEMENTATION IDEA
+
+You can build this using:
+
+Three.js for:
+
+Sky dome
+
+Cloud planes
+
+Grass shader
+
+Vertex shader for grass sway
+
+Noise-based wind animation
+
+GSAP for slow camera drift
+
+Fallback (low-end devices):
+
+Layered CSS parallax
+
+Video background loop (anime-style sky)
+
+🔮 ADVANCED PROMPT (PASTE INTO CLAUDE AI)
+
+Design a calm, romantic background inspired by anime worlds like Suzume.
+
+The environment should feature:
+
+A bright pastel blue sky with slow-moving fluffy clouds
+
+A wide open grassy field with tall grass gently swaying in the wind
+
+Warm sunlight with soft bloom and cinematic color grading
+
+Floating dust or pollen particles that move slowly in the air
+
+A peaceful, breathable atmosphere — no sharp motion, no harsh contrast
+
+The background must feel:
+
+Calm
+
+Hopeful
+
+Emotionally safe
+
+Like a quiet afternoon where time slows down
+
+Use soft pastel tones (sky blue, lavender, peach, warm gold).
+Add subtle depth-of-field, slight film grain, and slow parallax motion.
+
+This background should support a romantic Teddy Day experience where a living teddy (with heartbeat and breathing) exists peacefully within this world.
+
+The final result should feel like a scene from a Makoto Shinkai–style anime: open sky, wind, grass, and quiet emotions.
+
+💗 WHY THIS BACKGROUND IS PERFECT FOR HER
+
+Because it says:
+
+You’re safe here
+
+There’s space to breathe
+
+I’m not trapping you — I’m sitting beside you
+
+That’s why girls emotionally connect with sky + grass anime scenes.
+  </pre>
+
+  <script>
+    const steps = Array.from(document.querySelectorAll('.stage'));
+    const statusNote = document.getElementById('statusNote');
+    const flirtyRotate = document.getElementById('flirtyRotate');
+    const bars = document.querySelectorAll('[data-bar]');
+    const bgLayers = [document.getElementById('bg1'), document.getElementById('bg2')];
+    const teddyWrap = document.getElementById('teddyWrap');
+    const teddyHeart = document.getElementById('teddyHeart');
+    const teddy = document.getElementById('teddy');
+    const continueAfterInput = document.getElementById('continueAfterInput');
+    const puzzleYes = document.getElementById('puzzleYes');
+    const finalYes = document.getElementById('finalYes');
+    const holdButton = document.getElementById('holdButton');
+    const holdProgress = document.getElementById('holdProgress');
+    const finalWhisper = document.getElementById('finalWhisper');
+    const frame = document.getElementById('frame');
+
+    let stepIndex = 0;
+    let holdTimer = null;
+    let holdStart = null;
+
+    const flirtyLines = [
+      "It’s meant to be held close… very close.",
+      "This is the kind of soft that keeps you awake.",
+      "Warm. Quiet. Dangerous in the best way."
+    ];
+
+    function scaleFrame() {
+      const scale = Math.min(window.innerWidth / 3840, window.innerHeight / 2160);
+      frame.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+
+    function showStep(index) {
+      steps.forEach((step, i) => step.classList.toggle('active', i === index));
+      stepIndex = index;
+      statusNote.textContent = index === 0 ? 'This space waits for you.' : 'Stay as long as you like.';
+    }
+
+    function nextStep() {
+      if (stepIndex < steps.length - 1) {
+        showStep(stepIndex + 1);
+      }
+    }
+
+    function rotateBackground() {
+      let activeIndex = 0;
+      setInterval(() => {
+        bgLayers[activeIndex].classList.remove('active');
+        activeIndex = (activeIndex + 1) % bgLayers.length;
+        bgLayers[activeIndex].classList.add('active');
+      }, 14000);
+    }
+
+    function animateBars() {
+      bars.forEach((bar, i) => {
+        setTimeout(() => {
+          bar.style.width = '100%';
+        }, 600 + i * 300);
+      });
+    }
+
+    function setupInputGates() {
+      document.querySelectorAll('[data-requires-input]').forEach((input) => {
+        input.addEventListener('input', () => {
+          const stage = input.closest('.stage');
+          const hasText = input.value.trim().length > 0;
+          const continueBtn = stage.querySelector('button.yes') || stage.querySelector('button#continueAfterInput') || stage.querySelector('button#finalYes');
+          if (continueBtn) continueBtn.disabled = !hasText;
+        });
+      });
+    }
+
+    function setupConsentButtons() {
+      document.querySelectorAll('.stage .yes').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (stepIndex === 4) {
+            statusNote.textContent = 'The air warms. The teddy stays.';
+          }
+          if (stepIndex === 5) {
+            statusNote.textContent = 'The teddy breathes slower, closer.';
+          }
+          if (stepIndex === 9) {
+            statusNote.textContent = 'The constellation settles into place.';
+          }
+          if (stepIndex === 10) {
+            statusNote.textContent = 'The heartbeat deepens, slow and safe.';
+          }
+          nextStep();
+        });
+      });
+
+      document.querySelectorAll('.stage .no').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          statusNote.textContent = 'That’s okay. I’m still here.';
+        });
+      });
+    }
+
+    function setupKeyboardStart() {
+      document.addEventListener('keydown', (event) => {
+        if (stepIndex === 0 && (event.key === 'Enter' || event.key === ' ')) {
+          showStep(1);
+          setTimeout(() => {
+            showStep(2);
+            animateBars();
+          }, 1800);
+        }
+      });
+    }
+
+    function setupFlirtyRotation() {
+      let idx = 0;
+      setInterval(() => {
+        idx = (idx + 1) % flirtyLines.length;
+        flirtyRotate.textContent = flirtyLines[idx];
+      }, 6000);
+    }
+
+    function setupTeddyInteraction() {
+      if (!teddyWrap) return;
+      const speedUp = () => {
+        teddy.style.animationDuration = '4s';
+        teddyHeart.style.animationDuration = '1.6s';
+      };
+      const slowDown = () => {
+        teddy.style.animationDuration = '7s';
+        teddyHeart.style.animationDuration = '2.8s';
+      };
+      teddyWrap.addEventListener('mouseenter', speedUp);
+      teddyWrap.addEventListener('mouseleave', slowDown);
+      teddyWrap.addEventListener('touchstart', speedUp, { passive: true });
+      teddyWrap.addEventListener('touchend', slowDown, { passive: true });
+      teddyWrap.addEventListener('click', () => {
+        if (stepIndex === 2) {
+          nextStep();
+        }
+      });
+    }
+
+    function setupPuzzle() {
+      const puzzle = document.getElementById('puzzle');
+      if (!puzzle) return;
+      const pieces = puzzle.querySelectorAll('.piece');
+      const slots = puzzle.querySelectorAll('.slot');
+      let dragging = null;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      function pointerDown(event) {
+        dragging = event.currentTarget;
+        const rect = dragging.getBoundingClientRect();
+        offsetX = event.clientX - rect.left;
+        offsetY = event.clientY - rect.top;
+        dragging.style.cursor = 'grabbing';
+      }
+
+      function pointerMove(event) {
+        if (!dragging) return;
+        const puzzleRect = puzzle.getBoundingClientRect();
+        const x = event.clientX - puzzleRect.left - offsetX;
+        const y = event.clientY - puzzleRect.top - offsetY;
+        dragging.style.left = `${x}px`;
+        dragging.style.top = `${y}px`;
+      }
+
+      function pointerUp() {
+        if (!dragging) return;
+        const pieceId = dragging.dataset.piece;
+        const puzzleRect = puzzle.getBoundingClientRect();
+        const pieceRect = dragging.getBoundingClientRect();
+        slots.forEach((slot) => {
+          const slotRect = slot.getBoundingClientRect();
+          const overlapX = pieceRect.left < slotRect.right && pieceRect.right > slotRect.left;
+          const overlapY = pieceRect.top < slotRect.bottom && pieceRect.bottom > slotRect.top;
+          if (overlapX && overlapY && slot.dataset.slot === pieceId) {
+            dragging.style.left = `${slotRect.left - puzzleRect.left + 5}px`;
+            dragging.style.top = `${slotRect.top - puzzleRect.top + 5}px`;
+            slot.classList.add('filled');
+            dragging.style.pointerEvents = 'none';
+          }
+        });
+        dragging.style.cursor = 'grab';
+        dragging = null;
+        const allFilled = Array.from(slots).every((slot) => slot.classList.contains('filled'));
+        if (allFilled) {
+          puzzleYes.disabled = false;
+          statusNote.textContent = 'Take your time… I’m right here.';
+        }
+      }
+
+      pieces.forEach((piece) => {
+        piece.addEventListener('pointerdown', pointerDown);
+      });
+      document.addEventListener('pointermove', pointerMove);
+      document.addEventListener('pointerup', pointerUp);
+    }
+
+    function setupHold() {
+      if (!holdButton) return;
+      const duration = 3000;
+
+      function startHold() {
+        holdStart = performance.now();
+        holdProgress.style.transform = 'translateX(0)';
+        holdProgress.style.transition = `transform ${duration}ms linear`;
+        teddy.style.animationDuration = '8s';
+        teddyHeart.style.animationDuration = '3s';
+        holdTimer = requestAnimationFrame(updateHold);
+      }
+
+      function updateHold(now) {
+        if (!holdStart) return;
+        const elapsed = now - holdStart;
+        if (elapsed >= duration) {
+          finishHold();
+          return;
+        }
+        holdTimer = requestAnimationFrame(updateHold);
+      }
+
+      function finishHold() {
+        holdStart = null;
+        holdProgress.style.transition = 'none';
+        holdProgress.style.transform = 'translateX(100%)';
+        finalWhisper.textContent = 'Happy Teddy Day, kiddo.\nSleep easy tonight.';
+        statusNote.textContent = 'Yeah… like that.';
+      }
+
+      function cancelHold() {
+        if (!holdStart) return;
+        holdStart = null;
+        holdProgress.style.transition = 'none';
+        holdProgress.style.transform = 'translateX(-100%)';
+      }
+
+      holdButton.addEventListener('pointerdown', startHold);
+      holdButton.addEventListener('pointerup', cancelHold);
+      holdButton.addEventListener('pointerleave', cancelHold);
+    }
+
+    function setupContinueAfterInput() {
+      if (!continueAfterInput) return;
+      continueAfterInput.addEventListener('click', () => {
+        nextStep();
+      });
+    }
+
+    window.addEventListener('resize', scaleFrame);
+    scaleFrame();
+    rotateBackground();
+    setupKeyboardStart();
+    setupFlirtyRotation();
+    setupInputGates();
+    setupConsentButtons();
+    setupTeddyInteraction();
+    setupPuzzle();
+    setupHold();
+    setupContinueAfterInput();
+  </script>
+</body>
+
+</html>
